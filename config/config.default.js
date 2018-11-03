@@ -1,12 +1,6 @@
 
 exports.keys = "keepwork";
 
-exports.cors = {
-	origin: "http://xiaoyao.com:3000",
-	credentials: true,
-	exposeHeaders:"X-Total, X-Per-Page, X-Page",
-}
-
 exports.middleware = ['authenticated', 'pagination'];
 
 exports.security = {
