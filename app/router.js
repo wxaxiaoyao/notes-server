@@ -129,13 +129,11 @@ module.exports = app => {
 	router.resources(`${prefix}suggestions`, suggestion);
 
 	const link = controller.link;
+	router.post(`${prefix}links/upsert`, link.upsert);
 	router.resources(`${prefix}links`, link);
 
 	const demand = controller.demand;
 	router.resources(`${prefix}demands`, demand);
-
-	const field = controller.field;
-	router.resources(`${prefix}fields`, field);
 
 	const api = controller.api;
 	router.post(`${prefix}apis/search`, api.search);
