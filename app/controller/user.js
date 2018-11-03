@@ -2,8 +2,8 @@ const _ = require("lodash");
 const Controller = require("../core/controller.js");
 
 const User = class extends Controller {
-	constructor() {
-		super();
+	get modelName() {
+		return "users";
 	}
 
 	async index() {
@@ -63,7 +63,8 @@ const User = class extends Controller {
 	}
 
 	async login() {
-		const {ctx, model, config, util} = this;
+		const {ctx, model, util} = this;
+		const config = this.config.self;
 		const params = this.validate({
 			"username":"string",
 			"password":"string",
@@ -98,11 +99,12 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
-		return user;
+		return this.success(user);
 	}
 
 	async register() {
-		const {ctx, model, config, util} = this;
+		const {ctx, model, util} = this;
+		const config = this.config.self;
 		const reserveUsernames = ["system", "note", "www"];
 		const usernameReg = /^[\w\d]+$/;
 		const params = this.validate({

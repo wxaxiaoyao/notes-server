@@ -13,7 +13,9 @@ const File = class extends Controller {
 
 		const url = this.storage.getDownloadUrl(key);
 
-		return url;
+		//console.log(url);
+
+		return this.success(url);
 	}
 
 	async token() {
@@ -23,7 +25,7 @@ const File = class extends Controller {
 
 		if (!_.startsWith(key, username+"/")) return this.throw(400, "无权限");
 
-		return this.storage.getUploadToken(key);
+		return this.success(this.storage.getUploadToken(key));
 	}
 
 	async upsertFolder(userId, key) {
@@ -57,7 +59,7 @@ const File = class extends Controller {
 		await this.model.files.upsert(params);
 		const data = await this.model.files.findOne({where:{key}});
 		
-		return data;
+		return this.success(data);
 	}
 
 	async destroy() {
@@ -73,7 +75,7 @@ const File = class extends Controller {
 
 		data = await model.files.destroy({where:{id:file.id}});
 
-		return data;
+		return this.success(data);
 	}
 
 	async batchDelete() {

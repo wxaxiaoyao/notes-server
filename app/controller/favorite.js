@@ -1,3 +1,4 @@
+const joi = require("joi");
 const _ = require("lodash");
 const Controller = require("../core/controller.js");
 

@@ -34,6 +34,10 @@ class BaseController extends Controller {
 		return this.app.consts;
 	}
 
+	get storage() {
+		return this.app.storage;
+	}
+
 	get queryOptions() {
 		return this.ctx.state.queryOptions || {};
 	}
