@@ -7,6 +7,8 @@ const Code = class extends Controller {
 	all() {
 		const cmd_str = "git reset --hard HEAD; git pull origin master; npm install; pm2 restart note-server";
 		shell.exec(cmd_str);
+
+		return this.success("OK");
 	}
 }
 
