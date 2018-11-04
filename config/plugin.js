@@ -9,3 +9,8 @@ exports.cors = {
 	package: "egg-cors",
 }
 
+exports.io = {
+	enable: true,
+	package: "egg-socket.io",
+}
+

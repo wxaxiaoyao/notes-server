@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "egg-bin dev",
-    "rls": "EGG_SERVER_ENV=rls egg-bin dev",
-    "start": "egg-scripts start",
+    "dev": "egg-bin dev --sticky",
+    "rls": "EGG_SERVER_ENV=rls egg-bin dev --sticky",
+    "start": "egg-scripts start --sticky",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

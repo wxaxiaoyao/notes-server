@@ -1,6 +1,6 @@
 
 module.exports = app => {
-	const {router, controller} = app;
+	const {router, controller, io} = app;
 	const config = app.config.self;
 
 	const prefix = config.apiUrlPrefix;
@@ -122,6 +122,7 @@ module.exports = app => {
 	router.resources(`${prefix}teams`, team);
 
 	const daily = controller.daily;
+	router.post(`${prefix}dailies/upsert`, daily.upsert);
 	router.post(`${prefix}dailies/import`, daily.importDailies);
 	router.resources(`${prefix}dailies`, daily);
 
@@ -148,8 +149,13 @@ module.exports = app => {
 	router.resources(`${prefix}todos`, todo);
 
 	const tag = controller.tag;
+	router.post(`${prefix}tags/upsert`, tag.upsert);
 	router.resources(`${prefix}tags`, tag);
 	
 	const admin = controller.admin;
 	router.resources(`${prefix}admins/:resources`, admin);
+
+
+	// socket io router
+	io.of("/").route("sessions", io.controller.chat.sessions);``
 }

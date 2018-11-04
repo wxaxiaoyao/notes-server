@@ -12,6 +12,14 @@ module.exports = app => {
 	const timers = {};
 	const sequelize = app.model;
 
+	function writeFile(url, text) {
+		timers[url] && clearTimeout(timers[url]);
+		timers[url] = setTimeout(async() => {
+			console.log("备份数据到七牛: " + url);
+			await app.storage.upload(url, text);
+		}, 3000);
+	}
+
 	function hook(tableName, data, model,  oper) {
 		if (model && model.__hook__) {
 			return model.__hook__(data, oper);
@@ -20,15 +28,7 @@ module.exports = app => {
 		const url = "system/" + tableName + "/" + data.id;
 		const text = JSON.stringify(data);
 
-		this.writeFile(url, text);
-	}
-
-	function writeFile(url, text) {
-		timers[url] && clearTimeout(timers[url]);
-		timers[url] = setTimeout(async() => {
-			console.log("备份数据到七牛: " + url);
-			await app.storage.upload(url, text);
-		}, 3000);
+		writeFile(url, text);
 	}
 
 	sequelize.afterCreate(async (inst) => {

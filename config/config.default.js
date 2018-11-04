@@ -24,3 +24,15 @@ exports.onerror = {
 	}
 }
 
+exports.io = {
+	namespace: {
+		'/': {
+			connectionMiddleware:["authenticated"],
+			packetMiddleware:[],
+		},
+		'/chat': {
+			connectionMiddleware:["authenticated"],
+			packetMiddleware:[],
+		},
+	}
+}

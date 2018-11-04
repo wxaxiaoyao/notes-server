@@ -124,7 +124,7 @@ const Session = class extends Controller {
 
 		if (tos) {
 			const memberIds = tos.split("|").filter(o => o);
-			await this.model.sessions.increment({unreadMsgCount:1}, {where:{memberId:{[this.model.Op.in]:memberIds}}});
+			await this.model.sessions.increment({unreadMsgCount:1}, {where:{sessionId, memberId:{[this.model.Op.in]:memberIds}}});
 		}
 
 		msg = await this.model.messages.create(msg);
