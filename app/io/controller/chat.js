@@ -27,7 +27,7 @@ class Chat extends Controller {
 		const {socket, helper} = ctx;
 		const {userId} = socket.handshake.query;
 		const params = ctx.args[0];
-		const {action, sessionId, limit:200, message} = params;
+		const {action, sessionId, limit=200, message} = params;
 		const room = _.toString(sessionId);
 		const ack = ctx.args[1] || (() => {});	
 
