@@ -12,6 +12,7 @@ module.exports = app => {
 
 		if (user.userId == undefined || user.userId != userId) {
 			// 未认证
+			console.log("未认证, 关闭套接字");
 			socket.disconnect(true);
 		}
 
