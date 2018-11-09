@@ -91,6 +91,11 @@ module.exports = app => {
 	router.post(`${prefix}trades/pingpp`, trade.pingpp);
 	router.resources(`${prefix}trades`, trade);
 
+	const member = controller.member;
+	router.post(`${prefix}members/bulk`, member.bulkCreate);
+	router.get(`${prefix}members/exist`, member.exist);
+	router.resources(`${prefix}members`, member);
+
 	const apply = controller.apply;
 	router.resources(`${prefix}applys`, apply);
 
