@@ -82,12 +82,12 @@ module.exports = app => {
 	model.setObjectMembers = async function(objectId, objectType, members, userId) {
 		await app.model.members.destroy({where:{objectId, objectType}});
 
+		const datas = [];
 		for (let i = 0; i < members.length; i++) {
-			await app.model.members.create({
-				objectId, objectType, userId,
-				memberId: members[i],
-			});
+			datas.push({objectId, objectType, userId, memberId: members[i]});
 		}
+
+		await app.model.members.bulkCreate(datas);
 	}
 
 	app.model.members = model;
