@@ -55,6 +55,10 @@ class BaseController extends Controller {
 		return _.merge({}, this.ctx.request.body, this.ctx.query, this.ctx.params);
 	}
 
+	get log() {
+		return this.app.log;
+	}
+
 	validate(schema = {}, options = {allowUnknown:true}) {
 		const params = this.getParams();
 

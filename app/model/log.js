@@ -16,43 +16,22 @@ module.exports = app => {
 			primaryKey: true,
 		},
 
-		module: {
-			type: STRING(32),
-		},
-
-		// uid 日志归类
-		logId: {  
-			type: STRING(64),
-		},
-
-		url: {
-			type: STRING(128),
-		},
-
-		// 类型
-		type: {
-			type: INTEGER,
-		},
-
-		// 日志级别
 		level: {
-			type: INTEGER,
+			type: STRING(12),
+			defaultValue: "DEBUG",
 		},
 
-		// 日志信息
-		message: {
-			type: TEXT,
-		},
-
-		// 日志内容
 		text: {
 			type: TEXT,
+			defaultValue: "",
 		},
 
-		// data 
-		data: {
-			type: JSON,
+		date: {
+			type: STRING(24),
+			defaultValue: "",
 		},
+
+
 	}, {
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',

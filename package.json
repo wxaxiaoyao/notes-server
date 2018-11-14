@@ -28,6 +28,7 @@
     "jwt-simple": "^0.5.5",
     "loadsh": "0.0.3",
     "memory-cache": "^0.2.0",
+    "moment": "^2.22.2",
     "mysql2": "^1.6.1",
     "nodemailer": "^4.6.7",
     "pingpp": "^2.1.4",

@@ -9,6 +9,7 @@ const qiniu = require('./app/core/qiniu.js');
 const pingpp = require('./app/core/pingpp.js');
 const model = require('./app/core/model.js');
 //const ahocorasick = require('./app/core/ahocorasick.js');
+const log = require("./app/core/log.js");
 
 module.exports = app => {
   app.cache = cache;
@@ -24,6 +25,7 @@ module.exports = app => {
   qiniu(app);
   model(app);
   //ahocorasick(app);
+  log(app);
 
   //console.log(app.config.env);
   //
