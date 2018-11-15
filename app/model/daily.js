@@ -65,29 +65,29 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
-	model.hooktimer = {};
-	model.__hook__ = function(data, oper) {
-		const year = data.date.substring(0, data.date.indexOf("-"));
-		const url = "system/dailies/" + data.userId + "/" + year + ".json";  
-		this.hooktimer[url] && clearTimeout(this.hooktimer[url]);
-		this.hooktimer[url] = setTimeout(async () => {
-			const list = await app.model.dailies.findAll({
-				where: {
-					date: {
-						[app.model.Op.like]: year + "%",
-					}
-				}
-			});
+	//model.hooktimer = {};
+	//model.__hook__ = function(data, oper) {
+		//const year = data.date.substring(0, data.date.indexOf("-"));
+		//const url = "system/dailies/" + data.userId + "/" + year + ".json";  
+		//this.hooktimer[url] && clearTimeout(this.hooktimer[url]);
+		//this.hooktimer[url] = setTimeout(async () => {
+			//const list = await app.model.dailies.findAll({
+				//where: {
+					//date: {
+						//[app.model.Op.like]: year + "%",
+					//}
+				//}
+			//});
 			
-			_.each(list, (o, i) => list[i] = o.get({plain:true}));
+			//_.each(list, (o, i) => list[i] = o.get({plain:true}));
 
-			const text = global.JSON.stringify(list);
+			//const text = global.JSON.stringify(list);
 
-			console.log("备份数据到七牛: " + url);
-			app.storage.upload(url, text);
+			//console.log("备份数据到七牛: " + url);
+			//app.storage.upload(url, text);
 			
-		},3000);
-	}
+		//},3000);
+	//}
 	
 	model.getUniqueWhere = function({id, userId, date}) {
 		if (id) return {id};

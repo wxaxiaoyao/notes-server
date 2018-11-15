@@ -1,7 +1,6 @@
 const _ = require("lodash");
 
 module.exports = app => {
-
 	const models = {
 		users:"users", 
 		pages:"pages",
@@ -20,15 +19,38 @@ module.exports = app => {
 		}, 3000);
 	}
 
+	async function multi(tableName, model, inst) {
+		const {userId, id} = inst;
+		const no = await model.count({where:{userId, id: {[app.model.Op.lte]:id}}});
+		const size = 3000;
+		const page = Math.floor(no / size);
+		const offset = page * size;
+		const list = await model.findAll({where:{userId}, limit:size, offset});
+		const text = JSON.stringify(list);
+
+		const url = `__data__/${tableName}/${userId}/${page}.json`;
+
+		writeFile(url, text);
+	}
+
+	async function single(tableName, model, inst) {
+		const {userId=0, id}  = inst; 
+		const url = `__data__/${tableName}/${userId}/${id}.json`;
+		const text = JSON.stringify(inst);
+
+		writeFile(url, text);
+	}
+
 	function hook(tableName, data, model,  oper) {
 		if (model && model.__hook__) {
 			return model.__hook__(data, oper);
 		}
  
-		const url = "system/" + tableName + "/" + (data.userId || 0) + "/" + data.id;
-		const text = JSON.stringify(data);
-
-		writeFile(url, text);
+		if (tableName == "users") {
+			single(tableName, model, data);
+		} else {
+			multi(tableName, model, data);
+		}
 	}
 
 	async function afterCreate(inst) {

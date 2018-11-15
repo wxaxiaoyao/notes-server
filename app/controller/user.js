@@ -49,7 +49,7 @@ const User = class extends Controller {
 
 		const ok = await model.users.update(params, {where:{id:userId}});
 
-		return ok;
+		return this.success(ok);
 	}
 
 	async confirmpwd() {
@@ -144,7 +144,7 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
-		return user;
+		return this.success(user);
 	}
 
 	logout() {
@@ -155,7 +155,7 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
-		return ;
+		return this.success();
 	}
 
 	async changepwd() {
@@ -175,7 +175,7 @@ const User = class extends Controller {
 			}
 		});
 
-		return result && result[0] == 1;
+		return this.success(result && result[0] == 1);
 	}
 
 	// 手机验证第一步
