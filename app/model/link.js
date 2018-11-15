@@ -58,6 +58,20 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	model.hooktimer = {};
+	model.__hook__ = function(data, oper) {
+		const {userId} = data;
+		const url = "__data__/links/" + userId + ".json";  
+		this.hooktimer[url] && clearTimeout(this.hooktimer[url]);
+		this.hooktimer[url] = setTimeout(async () => {
+			const list = await app.model.dailies.findAll({limit:100000, where: {userId}});
+			_.each(list, (o, i) => list[i] = o.get({plain:true}));
+			const text = global.JSON.stringify(list);
+			console.log("备份数据到七牛: " + url);
+			app.storage.upload(url, text);
+		},3000);
+	}
+
 	app.model.links = model;
 	return model;
 };

@@ -4,9 +4,9 @@ module.exports = app => {
 
 	const models = {
 		users:"users", 
-		sites:"sites", 
 		pages:"pages",
 		dailies:"dailies",
+		links: "links",
 	};
 	
 	const timers = {};
@@ -24,14 +24,14 @@ module.exports = app => {
 		if (model && model.__hook__) {
 			return model.__hook__(data, oper);
 		}
-
-		const url = "system/" + tableName + "/" + data.id;
+ 
+		const url = "system/" + tableName + "/" + (data.userId || 0) + "/" + data.id;
 		const text = JSON.stringify(data);
 
 		writeFile(url, text);
 	}
 
-	sequelize.afterCreate(async (inst) => {
+	async function afterCreate(inst) {
 		const cls = inst.constructor;
 		const tableName = cls.getTableName();
 		const modelName = models[tableName];
@@ -41,9 +41,9 @@ module.exports = app => {
 		const model = models[tableName];
 
 		hook(tableName, data, model, "create");
-	});
+	}
 
-	sequelize.afterBulkUpdate(async (options) => {
+	async function afterBulkUpdate(options) {
 		const tableName = options.model.getTableName();
 		const modelName = models[tableName];
 		if (!modelName) return Promise.resolve([]);
@@ -57,12 +57,9 @@ module.exports = app => {
 		});
 
 		return list;
-	});
+	}
 
-	sequelize.beforeBulkDestroy(async (options) => {
-	});
-
-	sequelize.beforeUpsert(async (value, options) => {
+	async function beforeUpsert(value, options) {
 		const tableName = options.model.getTableName();
 		const modelName = models[tableName];
 		if (!modelName) return Promise.resolve();
@@ -75,5 +72,13 @@ module.exports = app => {
 		_.merge(data, value);
 
 		await hook(tableName, data, model, "upsert");
-	});
+	}
+
+	sequelize.afterCreate((inst) => afterCreate(inst));
+
+	sequelize.afterBulkUpdate((options) => afterBulkUpdate(options));
+
+	sequelize.beforeBulkDestroy(async (options) => {});
+
+	sequelize.beforeUpsert(async (value, options) => beforeUpsert);
 }

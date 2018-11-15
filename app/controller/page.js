@@ -1,5 +1,4 @@
 const _ = require("lodash");
-const {RepositoryFiles} = require("gitlab");
 
 const Controller = require("../core/controller.js");
 
