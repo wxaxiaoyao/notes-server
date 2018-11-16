@@ -15,9 +15,9 @@ module.exports = {
 	LOG_TYPE_DEFAULT:100,       // 默认类型
 
 	// 用户访问权限
-	USER_ACCESS_LEVEL_NONE:0,  // 无权限
 	USER_ACCESS_LEVEL_READ:32, // 读权限
 	USER_ACCESS_LEVEL_WRITE:64,// 写权限
+	USER_ACCESS_LEVEL_NONE:128,  // 无权限
 
 	// 实体类型
 	ENTITY_TYPE_USER:0,        // 用户类型

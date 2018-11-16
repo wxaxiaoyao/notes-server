@@ -49,7 +49,7 @@ const Group = class extends Controller {
 
 		const group = await this.model.groups.create(params);
 
-		if (members.length) await this.model.members.setObjectMembers(group.id, ENTITY_TYPE_GROUP, members, userId);
+		await this.model.members.setObjectMembers(group.id, ENTITY_TYPE_GROUP, members, userId);
 		
 		return this.success(group);
 	}
@@ -66,7 +66,7 @@ const Group = class extends Controller {
 
 		const result = await this.model.groups.update(params, {where:{id, userId}});
 
-		if (result[0] && members.length) await this.model.members.setObjectMembers(id, ENTITY_TYPE_GROUP, members, userId);
+		if (result[0]) await this.model.members.setObjectMembers(id, ENTITY_TYPE_GROUP, members, userId);
 		
 		return this.success("ok");
 

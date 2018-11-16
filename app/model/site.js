@@ -102,7 +102,7 @@ module.exports = app => {
 	model.isEditableByMemberId = async function(siteId, memberId) {
 		const level = await this.getMemberLevel(siteId, memberId);
 
-		if (level >= USER_ACCESS_LEVEL_WRITE) return true;
+		if (level >= USER_ACCESS_LEVEL_WRITE && level < USER_ACCESS_LEVEL_NONE) return true;
 
 		return false;
 	}
@@ -110,7 +110,7 @@ module.exports = app => {
 	model.isReadableByMemberId = async function(siteId, memberId) {
 		const level = await this.getMemberLevel(siteId, memberId);
 
-		if (level >= USER_ACCESS_LEVEL_READ) return true;
+		if (level >= USER_ACCESS_LEVEL_READ && level < USER_ACCESS_LEVEL_NONE) return true;
 
 		return false;
 	}
@@ -124,7 +124,7 @@ module.exports = app => {
 
 		if (site.userId == memberId) return USER_ACCESS_LEVEL_WRITE;
 
-		let level = site.visibility == ENTITY_VISIBILITY_PRIVATE ? USER_ACCESS_LEVEL_NONE : USER_ACCESS_LEVEL_READ;
+		let level = 0;
 
 		let sql = `select level 
 			from members
@@ -156,6 +156,8 @@ module.exports = app => {
 
 		_.each(list, val => level = level < val.level ? val.level : level);
 
+		level = level ? level : (site.visibility == ENTITY_VISIBILITY_PRIVATE ? USER_ACCESS_LEVEL_NONE : USER_ACCESS_LEVEL_READ);
+
 		return level;
 	}
 
@@ -176,7 +178,11 @@ module.exports = app => {
 			}
 		});
 
-		return list;
+		const refuseSiteId = [];
+		_.each(list, site => {if (site.level == USER_ACCESS_LEVEL_NONE) refuseSiteId.push(site.id)});
+		_.remove(list, o => refuseSiteId.indexOf(o.id) >= 0);
+
+		return _.uniqBy(list, "id");
 	}
 
 	model.getSiteGroups = async function(userId, siteId) {
