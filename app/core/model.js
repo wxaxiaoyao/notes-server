@@ -46,7 +46,7 @@ module.exports = app => {
 			return model.__hook__(data, oper);
 		}
  
-		if (tableName == "users") {
+		if (tableName == "users" || tableName == "pages") {
 			single(tableName, model, data);
 		} else {
 			multi(tableName, model, data);

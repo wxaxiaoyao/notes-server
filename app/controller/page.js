@@ -43,7 +43,7 @@ const Page = class extends Controller {
 
 		console.log(url, path);
 
-		this.storage.upload(path, content);
+		//this.storage.upload(path, content);
 
 		const projectId = "4980659";
 		const ok = await RepositoryFiles.edit(projectId,  path, "master",{
