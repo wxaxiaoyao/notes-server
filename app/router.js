@@ -5,6 +5,9 @@ module.exports = app => {
 
 	const prefix = config.apiUrlPrefix;
 
+	const index = controller.index;
+	router.resources(`${prefix}indexs`, index);
+
 	const code = controller.code;
 	router.all(`${prefix}codes`, code.all);
 
