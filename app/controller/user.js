@@ -148,11 +148,10 @@ const User = class extends Controller {
 	}
 
 	logout() {
-		const {ctx, config} = this;
-		ctx.cookies.set("token", "", {
+		this.ctx.cookies.set("token", "", {
 			maxAge: 0,
 			overwrite: true,
-			domain: "." + config.domain,
+			domain: "." + this.config.self.domain,
 		});
 
 		return this.success();
