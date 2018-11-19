@@ -8,6 +8,7 @@ module.exports = app => {
 		links: "links",
 	};
 	
+	const map = {};
 	const timers = {};
 	const sequelize = app.model;
 
@@ -60,7 +61,7 @@ module.exports = app => {
 		if (!modelName) return;
 
 		const data = inst.get({plain:true});
-		const model = models[tableName];
+		const model = app.model[modelName];
 
 		hook(tableName, data, model, "create");
 	}
@@ -96,11 +97,49 @@ module.exports = app => {
 		await hook(tableName, data, model, "upsert");
 	}
 
+	async function beforeBulkDestroy(options) {
+		const tableName = options.model.getTableName();
+		const modelName = models[tableName];
+		const key = JSON.stringify({tableName, where:options.where});
+
+		if (!modelName) return;
+
+		const list = await model.findAll({where:options.where});
+		_.each(list, (val, i) => list[i] = val.get({plain:true}));
+
+		map[key] = _.concat(map[key] || [], list);
+	}
+
+	async function afterBulkDestroy(options) {
+		const tableName = options.model.getTableName();
+		const modelName = models[tableName];
+		const key = JSON.stringify({tableName, where:options.where});
+		const model = app.model[modelName];
+		const apiName = tableName + "Destroy";
+
+		if (!modelName) return;
+	
+		const list = destroyMap[key] || [];
+		map[key] = [];
+
+		for (let i = 0; i < list.length; i++) {
+			const data = list[i];
+
+			hook(tableName, data, model, "destroy");
+
+			if (app.api[apiName]) {
+				await app.api[apiName](data);
+			}
+		}
+	}
+
 	sequelize.afterCreate((inst) => afterCreate(inst));
 
 	sequelize.afterBulkUpdate((options) => afterBulkUpdate(options));
 
-	sequelize.beforeBulkDestroy(async (options) => {});
+	sequelize.beforeBulkDestroy(options => beforeBulkDestroy(options));
+
+	app.model.afterBulkDestroy(options => afterBulkDestroy(options));
 
 	sequelize.beforeUpsert(async (value, options) => beforeUpsert);
 }
