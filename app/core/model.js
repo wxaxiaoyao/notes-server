@@ -119,7 +119,7 @@ module.exports = app => {
 
 		if (!modelName) return;
 	
-		const list = destroyMap[key] || [];
+		const list = map[key] || [];
 		map[key] = [];
 
 		for (let i = 0; i < list.length; i++) {
