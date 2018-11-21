@@ -289,7 +289,18 @@ const User = class extends Controller {
 		return this.success(user);
 	}
 
-	async contribution() {
+	// 增加用户活跃度
+	async addContributions() {
+		const {userId} = this.authenticated();
+		const {id, count=1} = this.validate({id:"int", count:"int_optional"});
+		
+		await this.model.contributions.addContributions(userId, count);
+
+		return this.success("OK");
+	}
+
+	// 获取用户的活跃度
+	async contributions() {
 		const {id} = this.validate({id:'int'});
 		const data = await this.model.contributions.getByUserId(id);
 

@@ -13,7 +13,8 @@ module.exports = app => {
 
 	const user = controller.user;
 	router.get(`${prefix}users/:id/detail`, user.detail);
-	router.get(`${prefix}users/:id/contribution`, user.contribution);
+	router.post(`${prefix}users/:id/contributions`, user.addContributions);
+	router.get(`${prefix}users/:id/contributions`, user.contributions);
 	router.post(`${prefix}users/register`, user.register);
 	router.post(`${prefix}users/login`, user.login);
 	router.post(`${prefix}users/logout`, user.logout);
