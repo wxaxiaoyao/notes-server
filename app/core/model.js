@@ -103,7 +103,7 @@ module.exports = app => {
 		const key = JSON.stringify({tableName, where:options.where});
 
 		if (!modelName) return;
-
+		const model = app.model[modelName];
 		const list = await model.findAll({where:options.where});
 		_.each(list, (val, i) => list[i] = val.get({plain:true}));
 
@@ -114,10 +114,10 @@ module.exports = app => {
 		const tableName = options.model.getTableName();
 		const modelName = models[tableName];
 		const key = JSON.stringify({tableName, where:options.where});
-		const model = app.model[modelName];
 		const apiName = tableName + "Destroy";
 
 		if (!modelName) return;
+		const model = app.model[modelName];
 	
 		const list = map[key] || [];
 		map[key] = [];
@@ -126,10 +126,6 @@ module.exports = app => {
 			const data = list[i];
 
 			hook(tableName, data, model, "destroy");
-
-			if (app.api[apiName]) {
-				await app.api[apiName](data);
-			}
 		}
 	}
 

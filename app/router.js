@@ -161,6 +161,12 @@ module.exports = app => {
 	router.post(`${prefix}tags/upsert`, tag.upsert);
 	router.resources(`${prefix}tags`, tag);
 	
+	const project = controller.project;
+	router.resources(`${prefix}projects`, project);
+
+	const bug = controller.project;
+	router.resources(`${prefix}bugs`, bug);
+
 	const admin = controller.admin;
 	router.resources(`${prefix}admins/:resources`, admin);
 

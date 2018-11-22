@@ -24,10 +24,7 @@ module.exports = app => {
 		name: {                      // 项目名称
 			type: STRING(255),
 			allowNull: false,
-		},
-
-		siteId: {                    // 站点Id
-			type: BIGINT,
+			unique: true,
 		},
 
 		privilege: {                 // 权限
@@ -35,25 +32,24 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
-		type: {                      // 评论对象类型  0 -- paracrfat  1 -- 网站 
-			type: INTEGER,
-			allowNull: false,
-			defaultValue: 1,
-		},
-
-		visit: {                     // 访问量
-			type: INTEGER,
-			defaultValue:0,
-		},
-
-		star: {                      // 点赞数量
-			type: INTEGER,
+		visibility: {
+			type: INTEGER,           // 项目可见性  0 - 公开  1 - 私有 
 			defaultValue: 0,
 		},
 
 		description: {               // 项目描述
-			type: STRING(255),
+			type: TEXT,
 			defaultValue:"",
+		},
+
+		members: {                   // 项目成员
+			type: TEXT,
+			defaultValue: "|",
+		},
+
+		tags: {                      // 项目标签
+			type: TEXT,
+			defaultValue: "|",
 		},
 
 		extra: {
@@ -82,6 +78,7 @@ module.exports = app => {
 	}
 
 	app.model.projects = model;
+
 	return model;
 };
 
