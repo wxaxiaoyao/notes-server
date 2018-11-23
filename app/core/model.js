@@ -6,6 +6,7 @@ module.exports = app => {
 		pages:"pages",
 		dailies:"dailies",
 		links: "links",
+		bugs: "bugs",
 	};
 	
 	const map = {};
