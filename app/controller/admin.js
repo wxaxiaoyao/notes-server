@@ -10,12 +10,9 @@ const Admin = class extends Controller {
 
 		this.resource = this.model[resourceName];
 
-		if (!this.model) this.ctx.throw(400, "args error");
+		if (!this.resource) this.ctx.throw(400, "args error");
 
-		this.authenticated();
-		const roleId = this.getUser().roleId;
-		
-		if (roleId != 10) this.ctx.throw(400, "no privlige");
+		this.adminAuthenticated();
 
 		return params;
 	}

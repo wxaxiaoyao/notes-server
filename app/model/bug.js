@@ -44,9 +44,14 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
-		assigns: {                     // 指派人
-			type: JSON,
-			defaultValue:[],
+		developer: {                   // 开发者
+			type: TEXT,
+			defaultValue: "|",
+		},
+
+		tester: {                      // 测试员
+			type: TEXT,
+			defaultValue: "|",
 		},
 
 		extra: {

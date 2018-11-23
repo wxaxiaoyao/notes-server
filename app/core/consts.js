@@ -94,6 +94,14 @@ module.exports = {
 	SOCKET_CMD_ECHO:0,    // echo 
 	SOCKET_CMD_MSG:1,     // 消息
 	SOCKET_CMD_SESSION:2, // 会话
+
+
+	BUG_STATE_INIT:0,     // 初始态 当前状态抉择是否合理
+	BUG_STATE_OPEN:1,     // 待测试 
+	BUG_STATE_TEST:2,     // 测试中
+	BUG_STATE_PASS:3,     // 测试通过
+	BUG_STATE_NOPASS:4,   // 测试不通过
+	BUG_STATE_CLOSE:5,    // 关闭结束
 }
 
 
