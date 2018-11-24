@@ -23,6 +23,11 @@ module.exports = app => {
 			allowNull: false,
 		},
 
+		projectId: {                  // 项目id
+			type: BIGINT,
+			defaultValue:0,
+		},
+
 		classify: {                    // api 类别
 			type: STRING,
 		},
