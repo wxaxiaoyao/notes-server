@@ -193,18 +193,14 @@ const Page = class extends Controller {
 	}
 
 	async index() {
-		const {ctx, model, config, util} = this;
-		const pages = model.pages;
-		const params = this.validate();
-		const where = params || {};
+		const {userId} = this.authenticated();
+		const query = this.validate();
 
-		if (where.urlPrefix){
-			where.url = {[this.app.Sequelize.Op.like]: where.urlPrefix + "%"};
-			delete where.urlPrefix;
-		} 
-		if (where.visibility == undefined) where.visibility = 0;
+		query.userId = userId;
 
-		const list = await pages.findAll({...this.queryOptions,exclude:["content"], where});
+		this.formatQuery(query);
+
+		const list = await this.model.pages.findAll({...this.queryOptions,exclude:["content"], query});
 
 		return this.success(list);	
 	}

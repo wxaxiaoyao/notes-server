@@ -168,6 +168,9 @@ module.exports = app => {
 	const bug = controller.bug;
 	router.resources(`${prefix}bugs`, bug);
 
+	const experience = controller.experience;
+	router.resources(`${prefix}experiences`, experience);
+
 	const admin = controller.admin;
 	router.resources(`${prefix}admins/:resources`, admin);
 
