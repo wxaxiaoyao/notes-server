@@ -55,6 +55,23 @@ class Chat extends Controller {
 			ack("params error");
 		}
 	}
+
+	async pushMessage() {
+		const {ctx, app} = this;
+		const {socket, helper} = ctx;
+		const {userId} = socket.handshake.query;
+		const message = ctx.args[0] || {};
+		const room = _.toString(sessionId);
+		const ack = ctx.args[1] || (() => {});	
+		const sessionId = message.sessionId;
+		message.userId = userId;
+		const message = this.model.sessions.findOne({where:{sessionId, memberId:userId}});
+		
+	}
+
+	async pullMessage() {
+		
+	}
 }
 
 module.exports = Chat;
