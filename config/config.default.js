@@ -30,9 +30,5 @@ exports.io = {
 			connectionMiddleware:["authenticated"],
 			packetMiddleware:[],
 		},
-		'/chat': {
-			connectionMiddleware:["authenticated"],
-			packetMiddleware:[],
-		},
 	}
 }

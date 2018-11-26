@@ -181,5 +181,5 @@ module.exports = app => {
 
 
 	// socket io router
-	io.of("/").route("sessions", io.controller.chat.sessions);``
+	io.of("/").route("sessions", io.controller.chat.sessions);
 }
