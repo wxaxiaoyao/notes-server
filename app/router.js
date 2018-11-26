@@ -170,6 +170,10 @@ module.exports = app => {
 
 	const experience = controller.experience;
 	router.resources(`${prefix}experiences`, experience);
+	
+	const qiniu = controller.qiniu;
+	router.get(`${prefix}qinius/token`, qiniu.token);
+	router.resources(`${prefix}qinius`, qiniu.token);
 
 	const admin = controller.admin;
 	router.resources(`${prefix}admins/:resources`, admin);
