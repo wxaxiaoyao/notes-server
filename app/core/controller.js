@@ -150,6 +150,20 @@ class BaseController extends Controller {
 		this.success(count);
 	}
 
+	async filter() {
+		const userId = this.authenticated().userId;
+		const model = this.model[this.modelName];
+		const options = this.validate();
+		options.where = options.where || {};
+		options.where.userId = userId;
+
+		this.formatQuery(options.where);
+
+		const list = await model.findAll(options);
+
+		return this.success(list);
+	}
+
 	async search() {
 		const model = this.model[this.modelName];
 		const query = this.validate();
