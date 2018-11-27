@@ -16,25 +16,35 @@ module.exports = app => {
 			primaryKey: true,
 		},
 		
-		userId: {  // 文件所属者
+		userId: {                       // 用户ID
 			type: BIGINT,
+			defaultValue: 0,
 		},
 
 		externalId: {
-			type: STRING(48),
+			type: STRING(128),
+			allowNull: false,
 		},
 
 		externalUsername: {
-			type: STRING(48),
+			type: STRING,
+			defaultValue:"",
 		},
 
 		type: {
 			type: INTEGER,
+			allowNull: false,
 		},
 
 		token: {
-			type: STRING(64),
-		}
+			type: STRING,
+			defaultValue:"",
+		},
+
+		extra: {
+			type: JSON,
+			defaultValue: {},
+		},
 
 	}, {
 		underscored: false,
