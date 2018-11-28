@@ -3,7 +3,7 @@ const _ = require("lodash");
 const Controller = require("../../core/ioController.js");
 
 class Chat extends Controller {
-	async sessions() {
+	async pullSessions() {
 		const socket = this.ctx.socket;
 		const {userId} = this.authenticated();
 
@@ -19,10 +19,36 @@ class Chat extends Controller {
 		this.success(list);
 	}
 
+	async pushSessions() {
+		const nsp = this.app.io.of("/");
+		const {userId} = this.authenticated();
+		const session = this.validate();
+
+		const sessions = await this.model.sessions.createSession({...session, userId});
+		const memberIds = _.sortedUniq(session.memberIds || []);
+
+		if (sessions.length == 0) return this.success();
+
+		const sessionId = sessions[0].sessionId;
+		const ps = [];
+		_.each(sessions, session => {
+			const memberId = session.memberId;
+			ps.push(new Promise((resolve, reject) => {
+				_.each(nsp.to(memberId).sockets, sock => sock.join(sessionId, () => resolve()));
+			}));
+		});
+
+		await Promise.all(ps);
+
+		nsp.to(sessionId).emit("push_sessions", session);
+
+		return this.success();
+	}
+
 	async pushMessages() {
 		const nsp = this.app.io.of("/");
 		const {userId} = this.authenticated();
-		const message = this.validate({sessionId:"int"});
+		const message = this.validate({sessionId:"string"});
 		const sessionId = message.sessionId;
 
 		message.userId = userId;
@@ -47,7 +73,7 @@ class Chat extends Controller {
 	async pullMessages() {
 		const nsp = this.app.io.of("/");
 		const {userId} = this.authenticated();
-		const {sessionId} = this.validate({sessionId:"int"});
+		const {sessionId} = this.validate({sessionId:"string"});
 
 		let session = this.model.sessions.findOne({where:{sessionId, memberId:userId}});
 		if (!session) return this.throw(400, "会话不存在");

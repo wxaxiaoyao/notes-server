@@ -60,6 +60,9 @@ module.exports = app => {
 	}
 
 	storage.upload = async function(key, content) {
+		const accessKey = "qPCxQ1ZsJnhESNNftGWh5oTaDesVgzM_O4O0h8Wg";
+		const secretKey = "FuGR0iBiTRq0D9uuR_EmUZgwxPUX2UvLrej5W2IJ";
+		const bucketName = "note-statics";
 		const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
 		const putPolicy = new qiniu.rs.PutPolicy({scope: bucketName + ":" + key});
 		const token = putPolicy.uploadToken(mac);

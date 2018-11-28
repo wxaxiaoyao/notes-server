@@ -1,4 +1,5 @@
 
+const uuidv1 = require('uuid/v1');
 const _ = require("lodash");
 
 module.exports = app => {
@@ -24,7 +25,7 @@ module.exports = app => {
 		},
 
 		sessionId: {          // 会话id
-			type: BIGINT,
+			type: STRING,
 			allowNull: false,
 			defaultValue: 0,
 		},
@@ -39,6 +40,11 @@ module.exports = app => {
 			defaultValue: "",
 		},
 		
+		members: {
+			type: TEXT,
+			defaultValue:"|",
+		},
+
 		memberId: {           // 成员id
 			type: BIGINT,
 			allowNull: false,
@@ -78,21 +84,23 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
-	model.createSession = async function({userId, title, description, memberIds}) {
-		const data = {userId, title, description, memberId:userId};
-		const session = await app.model.sessions.create(data);
-		if (!session) return;
-
-		const sessionId = session.id;
-		await app.model.sessions.update({sessionId}, {where:{id:sessionId}});
-
+	model.createSession = async function(session) {
+		const sessionId = session.userId + uuidv1().replace(/-/g, "");
+		
+		let memberIds = session.memberIds || [];
+		memberIds.push(session.userId);
+		memberIds = _.sortedUniq(memberIds);
+		session.members = "|" + memberIds.join("|") + "|";
+		session.sessionId = sessionId;
+		
 		const datas = [];
-		_.each(memberIds, memberId => datas.push({...data, sessionId, memberId}));
+		_.each(memberIds, memberId => datas.push({...session, memberId}));
 
 		await app.model.sessions.bulkCreate(datas);
 		
-		session.sessionId = sessionId;
-		return session;
+		const sessions = await app.model.sessions.findAll({where:{sessionId}});
+		
+		return sessions;
 	}
 
 	model.members = async function(sessionId) {

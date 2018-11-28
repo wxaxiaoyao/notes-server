@@ -7,7 +7,7 @@ module.exports = app => {
 		const {token, userId} = query;
 
 		ctx.state.token = token;
-		ctx.state.user = {userId};
+		ctx.state.user = {userId:_.toNumber(userId)};
 	
 		await next();
 	}
