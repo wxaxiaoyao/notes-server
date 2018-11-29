@@ -306,6 +306,14 @@ const User = class extends Controller {
 
 		return this.success(data);
 	}
+
+	// 用户联系人
+	async contacts() {
+		const {userId} = this.authenticated();
+		const users = await this.model.users.contacts(userId);
+
+		return this.success(users);
+	}
 }
 
 module.exports = User;

@@ -85,7 +85,8 @@ module.exports = app => {
 	//});
 	
 	model.createSession = async function(session) {
-		const sessionId = session.userId + uuidv1().replace(/-/g, "");
+		const userId = session.userId;
+		let sessionId = session.userId + uuidv1().replace(/-/g, "");
 		
 		let memberIds = session.memberIds || [];
 		memberIds.push(session.userId);
@@ -93,10 +94,15 @@ module.exports = app => {
 		session.members = "|" + memberIds.join("|") + "|";
 		session.sessionId = sessionId;
 		
-		const datas = [];
-		_.each(memberIds, memberId => datas.push({...session, memberId}));
-
-		await app.model.sessions.bulkCreate(datas);
+		// 是否已存在会话
+		let sess = await app.model.sessions.findOne({where:{members: session.members, memberId: userId}});
+		if (!sess) {
+			const datas = [];
+			_.each(memberIds, memberId => datas.push({...session, memberId}));
+			await app.model.sessions.bulkCreate(datas);
+		} else {
+			sessionId = sess.sessionId;
+		}
 		
 		return await this.getSessionsBySessionId(sessionId);
 	}

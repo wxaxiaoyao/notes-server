@@ -52,13 +52,12 @@ class Chat extends Controller {
 		message.state = 0;
 
 		// 不记录系统会话消息
-		//if (sessionId == 0) return this.socket.emit("push_messages", message);
+		if (sessionId == "systemsession") return this.socket.emit("push_messages", message);
 
 		let session = this.model.sessions.findOne({where:{sessionId, memberId:userId}});
 		if (!session) return this.throw(400, "会话不存在");
 
-		const memberIds = _.map((message.tos || "").split("|").filter(o => o), _.toNumber);
-		if (memberIds.length) await this.model.sessions.increment({unreadMsgCount:1}, {where:{sessionId, memberId:{[this.model.Op.in]:memberIds}}});
+		await this.model.sessions.increment({unreadMsgCount:1}, {where:{sessionId, memberId:{[this.model.Op.ne]:userId}}});
 		let msg = await this.model.messages.create(message);
 		msg = msg.get({plain:true});
 

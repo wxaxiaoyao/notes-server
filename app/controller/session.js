@@ -38,6 +38,26 @@ const Session = class extends Controller {
 
 	// 禁止更新
 	async update() {
+		const params = this.validate({id:"int"});
+		const {userId} = this.authenticated();
+
+		delete params.userId;
+		delete params.members;
+		delete params.memberId;
+
+		await this.model.sessions.update(params, {where:{id:params.id, memberId:userId}});
+
+		return this.success();
+	}
+
+	// 禁止更新
+	async destroy() {
+		const {id} = this.validate({id:"int"});
+		const {userId} = this.authenticated();
+
+		await this.model.sessions.update({state:1}, {where:{id, memberId:userId}});
+
+		return this.success();
 	}
 
 	// 成员加入

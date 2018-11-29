@@ -129,6 +129,27 @@ module.exports = app => {
 		return;
 	}
 
+	model.contacts = async function(userId) {
+		const list = await app.model.projects.findAll({where: {
+			$or: [
+			{userId},
+			{members:{$like:`|${userId}|`}}
+			]
+		}});
+
+		let userIds = [];
+		_.each(list, project => {
+			userIds.push(project.userId);
+			let members = _.map(project.members.split("|").filter(o => o), _.toNumber);
+			userIds = userIds.concat(members);
+		});
+		userIds = _.uniq(userIds);
+
+		let users = await this.getUsers(userIds);
+
+		return _.values(users);
+	}
+
 	app.model.users = model;
 	return model;
 };
