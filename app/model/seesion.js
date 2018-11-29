@@ -89,7 +89,7 @@ module.exports = app => {
 		
 		let memberIds = session.memberIds || [];
 		memberIds.push(session.userId);
-		memberIds = _.sortedUniq(memberIds);
+		memberIds = _.sortBy(_.uniq(memberIds));
 		session.members = "|" + memberIds.join("|") + "|";
 		session.sessionId = sessionId;
 		
@@ -98,9 +98,38 @@ module.exports = app => {
 
 		await app.model.sessions.bulkCreate(datas);
 		
+		return await this.getSessionsBySessionId(sessionId);
+	}
+
+	model.loadSessionMembers = async function(sessions) {
+		let userIds = [];
+		_.each(sessions, (session, i) => {
+			session = session.get ? session.get({plain:true}) : session;
+			userIds.push(session.userId);
+			session.members = session.members.split("|").filter(o => o);
+			_.each(session.members, (id, i) => {
+				id = _.toNumber(id);
+				session.members[i] = id;
+				userIds.push(id);
+			});
+			sessions[i] = session;
+		});
+
+		const users = await app.model.users.getUsers(userIds);
+		_.each(sessions, session => {
+			const members = [];
+			_.each(session.members, memberId => members.push(users[memberId]));
+			session.members = members;
+			session.user = users[session.userId];
+		});
+
+		return sessions;
+	}
+
+	model.getSessionsBySessionId = async function(sessionId) {
 		const sessions = await app.model.sessions.findAll({where:{sessionId}});
 		
-		return sessions;
+		return await this.loadSessionMembers(sessions);
 	}
 
 	model.members = async function(sessionId) {

@@ -7,16 +7,13 @@ class Chat extends Controller {
 		const socket = this.ctx.socket;
 		const {userId} = this.authenticated();
 
-		let list = await this.model.sessions.findAll({where:{memberId:userId}});
+		let sessions = await this.model.sessions.findAll({where:{memberId:userId}});
+		sessions = await this.model.sessions.loadSessionMembers(sessions);
+
 		const rooms = [];
-		_.each(list, session => {
-			session = session.get({plain:true});
-			rooms.push(_.toString(session.sessionId));
-		});
+		_.each(sessions, session => rooms.push(session.sessionId));
 
-		socket.join(rooms);
-
-		this.success(list);
+		socket.join(rooms, this.success(sessions));
 	}
 
 	async pushSessions() {
@@ -40,7 +37,7 @@ class Chat extends Controller {
 
 		await Promise.all(ps);
 
-		nsp.to(sessionId).emit("push_sessions", session);
+		_.each(sessions, session => nsp.to(session.memberId).emit("push_sessions", session));
 
 		return this.success();
 	}
@@ -55,17 +52,17 @@ class Chat extends Controller {
 		message.state = 0;
 
 		// 不记录系统会话消息
-		if (sessionId == 0) return this.socket.emit("push_messages", message);
+		//if (sessionId == 0) return this.socket.emit("push_messages", message);
 
 		let session = this.model.sessions.findOne({where:{sessionId, memberId:userId}});
 		if (!session) return this.throw(400, "会话不存在");
 
-		const memberIds = (message.tos || "").split("|").filter(o => o);
+		const memberIds = _.map((message.tos || "").split("|").filter(o => o), _.toNumber);
 		if (memberIds.length) await this.model.sessions.increment({unreadMsgCount:1}, {where:{sessionId, memberId:{[this.model.Op.in]:memberIds}}});
 		let msg = await this.model.messages.create(message);
 		msg = msg.get({plain:true});
 
-		nsp.to(`${sessionId}`).emit("push_messages", msg);
+		nsp.to(sessionId).emit("push_messages", msg);
 
 		return this.success(msg);
 	}

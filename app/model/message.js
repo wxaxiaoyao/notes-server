@@ -24,7 +24,7 @@ module.exports = app => {
 		},
 
 		sessionId: {          // 会话id  0 -- 系统会话
-			type: BIGINT,
+			type: STRING,
 			allowNull:  false,
 		},
 
