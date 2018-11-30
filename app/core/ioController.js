@@ -40,7 +40,7 @@ class IoController extends Controller {
 
 	get queryOptions() {
 		const params = this.ctx.args[0] || {};
-		const perPage = params["x-per-page"] || 200;
+		const perPage = params["x-per-page"] || 50;
 		const order = params["x-order"] || "id-asc";
 		const page = params["x-page"] || 1;
 		const orders = [];

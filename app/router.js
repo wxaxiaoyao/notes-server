@@ -148,7 +148,7 @@ module.exports = app => {
 
 	const api = controller.api;
 	router.post(`${prefix}apis/filter`, api.filter);
-	router.post(`${prefix}apis/search`, api.search);
+	//router.post(`${prefix}apis/search`, api.search);
 	router.post(`${prefix}apis/configs`, api.setConfig);
 	router.get(`${prefix}apis/configs`, api.getConfig);
 	router.resources(`${prefix}apis`, api);

@@ -7,6 +7,26 @@ const Api = class extends Controller {
 		return "apis";
 	}
 
+	async index() {
+		const {userId} = this.authenticated();
+		let  query = this.validate();
+		this.formatQuery(query);
+		query.userId = userId;
+		if (!query.projectId) {
+			const ids = [];
+			const projects = await this.model.projects.findAll({where:{$or:[{userId}, {members:{$like:`%|${userId}|%`}}]}});
+			_.each(projects, o => ids.push(o.id));
+			if (ids.length) {
+				query.projectId = {$in: ids};
+				query = {$or:[{projectId:{$in:ids}}, query]};
+			}
+		}
+
+		const result = await this.model.apis.findAll({...this.queryOptions, where:query});
+
+		this.success(result);
+	}
+
 	async show() {
 		const {id} = this.validate({id:"int"});
 

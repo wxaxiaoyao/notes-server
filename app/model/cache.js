@@ -56,6 +56,10 @@ module.exports = app => {
 	}
 
 	model.put = async function(key, value, expire) {
+		return await this.set(key, value, expire);
+	}
+	
+	model.set = async function(key, value, expire) {
 		if (expire) expire += (new Date()).getTime();
 
 		await app.model.caches.upsert({key, value, expire});
