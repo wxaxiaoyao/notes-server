@@ -128,6 +128,9 @@ const User = class extends Controller {
 
 		user = user.get({plain:true});
 
+		// 创建用户账号记录
+		await this.model.accounts.upsert({userId: user.id});
+
 		//const roleId = rolesModel.getRoleIdByUserId(user.id);
 		const token = util.jwt_encode({
 			userId: user.id, 

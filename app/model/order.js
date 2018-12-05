@@ -1,3 +1,4 @@
+
 module.exports = app => {
 	const {
 		BIGINT,
@@ -8,7 +9,7 @@ module.exports = app => {
 		JSON,
 	} = app.Sequelize;
 
-	const model = app.model.define("trades", {
+	const model = app.model.define("orders", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
@@ -19,15 +20,35 @@ module.exports = app => {
 			type: BIGINT,
 			allowNull:  false,
 		},
-
-		description: {               // 交易内容
-			type: STRING,       
-			defaultValue:"",
+		
+		orderNo: {
+			type: STRING(64), // 交易号
+			unique: true,
 		},
 
-		amount: {                    // 金额 +300元  +10 知识币 -10 知识豆
-			type: STRING,
-			defaultValue:"",
+		amount: {
+			type: INTEGER,
+		},
+
+		goodsId: {
+			type: BIGINT,  // 物品ID
+			defaultValue: 0,
+		},
+
+		state: {
+			type: BIGINT, // 交易状态
+		},
+
+		channel: {                   // 支付渠道
+			type: STRING(16),
+		},
+
+		chargeId: {
+			type: STRING(64), // pingppId
+		},
+
+		refundId: {
+			type: STRING(64), // pingppId
 		},
 
 		extra: {
@@ -43,7 +64,8 @@ module.exports = app => {
 
 	//model.sync({force:true});
 	
-	app.model.trades = model;
+	app.model.orders = model;
+	
 	return model;
 };
 

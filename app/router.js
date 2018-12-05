@@ -92,8 +92,11 @@ module.exports = app => {
 	router.get(`${prefix}issues/statistics`, issue.statistics);
 	router.resources(`${prefix}issues`, issue);
 
+	const order = controller.order;
+	router.post(`${prefix}orders/pingpp`, order.pingpp);
+	router.resources(`${prefix}orders`, order);
+
 	const trade = controller.trade;
-	router.post(`${prefix}trades/pingpp`, trade.pingpp);
 	router.resources(`${prefix}trades`, trade);
 
 	const member = controller.member;
@@ -178,6 +181,9 @@ module.exports = app => {
 	router.resources(`${prefix}qinius`, qiniu.token);
 
 	const admin = controller.admin;
+	//router.all(`${prefix}admins/query`, admin.query);
+	//router.post(`${prefix}admins/login`, admin.login);
+	//router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 

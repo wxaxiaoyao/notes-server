@@ -1,5 +1,6 @@
 const joi = require("joi");
 const _ = require("lodash");
+const moment = require("moment");
 const qrcode = require("qrcode");
 
 const Controller = require("../core/controller.js");
@@ -30,13 +31,23 @@ const Trade = class extends Controller {
 		return "trades";
 	}
 
+	async index() {
+
+		const result = await this.model.query("select * from trades", {
+			type: this.model.QueryTypes.SELECT,
+		});
+
+		return this.success(result);
+	}
+
 	async getPayQR(trade) {
 		//channel = "wx_pub_qr" // 微信扫码支付
 		//channel = "alipay_qr" // 支付宝扫码支付
 		const channel = trade.channel;
-		const config = this.app.config;
+		const config = this.app.config.self;
+		const datetime = moment().format("YYYYMMDDHHmmss");
 		const chargeData = {
-			order_no: this.app.util.getDate().datetime + "trade" + trade.id,
+			order_no: datetime + "trade" + trade.id,
 			app: {id: config.pingpp.appId},
 			channel: trade.channel,
 			amount: trade.amount,			
@@ -56,7 +67,7 @@ const Trade = class extends Controller {
 			return this.throw(400, "参数错误");
 		}
 
-		const charge = await this.app.pay.chrage(chargeData).catch(e => console.log(e));
+		const charge = await this.ctx.service.pay.chrage(chargeData).catch(e => console.log(e));
 		if (!charge) {
 			return this.throw(500, "提交pingpp充值请求失败");
 		}
@@ -104,7 +115,7 @@ const Trade = class extends Controller {
 		return this.success(trade);
 	}
 	
-	async payQR(ctx) {
+	async payQR() {
 		const {id, channel} = this.validate({
 			id:'int',
 			channel: "string",
@@ -114,8 +125,8 @@ const Trade = class extends Controller {
 		if (!trade) return this.throw(400, "Not Found");
 		trade = trade.get({plain:true});
 
-		if (trade.state != TRADE_STATE_START && trade.state == TRADE_STATE_CHARGING) {
-			return this.throw(400, "交易已失效");
+		if (trade.state != TRADE_STATE_START && trade.state != TRADE_STATE_CHARGING) {
+			return this.throw(400, "交易已失效, state:" + trade.state);
 		}
 
 		trade.channel = channel;
@@ -125,11 +136,11 @@ const Trade = class extends Controller {
 			trade.QR = await generateQR(trade.payQRUrl);
 		}
 
-		return this.success(data);
+		return this.success(trade);
 	}
 
 	async refund(trade) {
-		const refund = await this.app.pay.refund(trade).catch(e => console.log(e));
+		const refund = await this.ctx.service.pay.refund(trade).catch(e => console.log(e));
 		if (refund) {
 			trade.refundId = refund.id;
 			trade.state = TRADE_STATE_REFUNDING;
@@ -186,7 +197,7 @@ const Trade = class extends Controller {
 		//newTrade.description = "余额购买" + newTrade.subject;
 		//await this.model.trades.upsert(newTrade);
 
-		return this.success(newTrade);
+		return this.success("OK");
 	}
 
 	async refundCallback() {
@@ -198,7 +209,7 @@ const Trade = class extends Controller {
 		const body = JSON.stringify(params);
 
 		console.log("-----------------pingpp callback-----------------");
-		if (!this.app.pay.verifySignature(body, signature)) {
+		if (!this.ctx.service.pay.verifySignature(body, signature)) {
 			await this.model.logs.create({text:"签名验证失败"});
 			return this.throw(400, "签名验证失败");
 		}

@@ -1,0 +1,14 @@
+
+type Lesson {
+	userId: Int!
+	user: LessonUser
+}
+
+type LessonUser {
+	id: Int!
+	username: String!
+	coin: Int
+	bean: Int
+	identify: Int
+	lockCoin: Int
+}

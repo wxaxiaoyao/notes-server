@@ -26,12 +26,6 @@ module.exports = app => {
 			defaultValue: "",
 		},
 
-		date: {
-			type: STRING(24),
-			defaultValue: "",
-		},
-
-
 	}, {
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',
