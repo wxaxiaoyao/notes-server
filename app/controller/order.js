@@ -4,6 +4,7 @@ const _ = require("lodash");
 const moment = require("moment");
 const qrcode = require("qrcode");
 const uuidv1 = require('uuid/v1');
+const axios = require("axios");
 
 const Controller = require("../core/controller.js");
 const {
@@ -18,6 +19,11 @@ const {
 	ORDER_STATE_CHARGING,
 	ORDER_STATE_CHARGE_SUCCESS,
 	ORDER_STATE_CHARGE_FAILED,
+
+	TRADE_TYPE_CHARGE,
+	TRADE_TYPE_EXCHANGE,
+	TRADE_TYPE_PACKAGE_BUY,
+	TRADE_TYPE_LESSON_STUDY,
 } = require("../core/consts.js");
 
 const generateQR = async text => {
@@ -28,8 +34,21 @@ const generateQR = async text => {
 	}
 }
 
-const Trade = class extends Controller {
+// 订单设计仅为解决充值功能 
+
+const Order = class extends Controller {
 	get modelName() {
+		return "orders"
+	}
+
+	async index() {
+		return this.success("OK");
+	}
+	async destroy() {
+		return this.success("OK");
+	}
+	async update() {
+		return this.success("OK");
 	}
 
 	async create() {
@@ -40,9 +59,12 @@ const Trade = class extends Controller {
 			amount: "int",
 			channel: "string",  // wx_pub_qr   alipay_qr
 			goodsId: "int_optional",
+			count: "int_optional", // 购买量
 		});
+
+		const count = params.count || 1;
  
-		let order = await this.model.orders.create({userId}).then(o => o && o.toJSON());
+		let order = await this.model.orders.create({userId, count}).then(o => o && o.toJSON());
 		if (!order) return this.throw(500, "创建订单记录失败");
 
 		const channel = params.channel;
@@ -78,6 +100,7 @@ const Trade = class extends Controller {
 		order = {
 			...order,
 			userId,
+			count,
 			orderNo: order_no,
 			amount: params.amount,
 			goodsId: params.goodsId || 0,
@@ -95,33 +118,8 @@ const Trade = class extends Controller {
 		return this.success({...order, payQRUrl, QRUrl, QR});
 	}
 
-	//async refund(trade) {
-		//const refund = await this.ctx.service.pay.refund(trade).catch(e => console.log(e));
-		//if (refund) {
-			//trade.refundId = refund.id;
-			//trade.state = TRADE_STATE_REFUNDING;
-			//trade.description = "退款进行中";
-		//} else {
-			//trade.state = TRADE_STATE_REFUND_FAILED;
-			//trade.description = "提交pingpp退款请求失败";
-		//}
-		//await this.model.trades.update(trade, {where:{id:trade.id}});
-		//return;
-	//}
-
-	async chargeCallback(order) {
-		// 没有回调 用户单纯充值	
-		if (!order.goodsId) return;
-
-		const good = await this.model.goods.findOne({where:{id: order.goodsId}}).then(o => o && o.toJSON());
-
-		if (!good.callback) return;
-	}
-
-	async refundCallback() {
-	}
-
-	async pingpp() {
+	// pingpp充值回调接口  只处理充值逻辑
+	async charge() {
 		const params = this.validate();
 		const signature = this.ctx.headers["x-pingplusplus-signature"];
 		const body = JSON.stringify(params);
@@ -156,19 +154,21 @@ const Trade = class extends Controller {
 		// 更新订单状态
 		await this.model.orders.update({state, description}, {where:{id:order.id}});
 		// 增加用户余额
-		await this.model.account.increment({rmb: order.amount}, {where:{userId: order.userId}});
+		await this.model.accounts.increment({rmb: order.amount}, {where:{userId: order.userId}});
 		// 增加充值交易明细
 		await this.model.trades.create({
 			userId:order.userId, 
-			description: order.channel == "wx_pub_qr" ? "微信充值" : "支付宝充值",
-			amount: "+" + order.amount + "元", 
+			type: TRADE_TYPE_CHARGE,
+			subject: order.channel == "wx_pub_qr" ? "微信充值" : "支付宝充值",
+			rmb: order.amount, 
 		});
 
 		order.state = state;
 		order.description = description;
 
+		// 
 		if (params.type == "charge.succeeded") {
-			await this.chargeCallback(order);
+			//await this.chargeCallback(order);
 		//} else if (params.type == "refund.succeeded") {
 			//await this.refundCallback(order);
 		} else {
@@ -177,6 +177,65 @@ const Trade = class extends Controller {
 		return this.success("OK");
 	}
 
+	//async refund(trade) {
+		//const refund = await this.ctx.service.pay.refund(trade).catch(e => console.log(e));
+		//if (refund) {
+			//trade.refundId = refund.id;
+			//trade.state = TRADE_STATE_REFUNDING;
+			//trade.description = "退款进行中";
+		//} else {
+			//trade.state = TRADE_STATE_REFUND_FAILED;
+			//trade.description = "提交pingpp退款请求失败";
+		//}
+		//await this.model.trades.update(trade, {where:{id:trade.id}});
+		//return;
+	//}
+
+	async chargeCallback(order) {
+		// 没有回调 用户单纯充值	
+		if (!order.goodsId) return;
+
+		const goods = await this.model.goods.findOne({where:{id: order.goodsId}}).then(o => o && o.toJSON());
+
+		if (!goods.callback) return;
+		const data = {extra: goods.callbackData || {}, amount: order.amount, goods};
+
+		const account = await this.model.accounts.getByUserId(order.userId);
+		const rmb = goods.rmb * order.count;
+		const coin = goods.coin * order.count;
+		const bean = goods.bean * order.count;
+		if (!account || account.rmb < rmb || account.coin < coin || account.bean < bean) {
+			await this.model.logs.create({text:"余额不足"});
+			return;
+		}
+
+		// 加密数据
+		try {
+			await axios.post(goods.callback, data);
+		} catch(e) {
+			await this.model.logs.create({text:"物品兑换失败"});
+			return ;
+		}
+
+		// 交易成功 减去用户余额
+		await this.model.accounts.decrement({rmb, coin, bean}, {where:{userId: order.userId}});
+
+		// 写交易记录
+		await this.model.trades.create({
+			userId:order.userId, 
+			type: TRADE_TYPE_EXCHANGE,
+			subject: goods.subject,
+			body: goods.body,
+			rmb: rmb, 
+			coin: coin,
+			bean: bean,
+		});
+		
+	}
+
+	async refundCallback() {
+	}
+
 }
 
-module.exports = Trade;
+module.exports = Order;

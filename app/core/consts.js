@@ -82,8 +82,10 @@ module.exports = {
 	ORDER_STATE_CHARGE_FAILED:512, // 订单充值失败
 
 	// 交易类型
-	TRADE_TYPE_CHARGE:0,  // 充值
-	TRADE_TYPE_EXPENSE:1, // 消费
+	TRADE_TYPE_CHARGE:0,      // 充值
+	TRADE_TYPE_EXCHANGE:1,    // 兑换
+	TRADE_TYPE_PACKAGE_BUY:2,   // 购买课程包
+	TRADE_TYPE_LESSON_STUDY: 3, // 课程学习
 
 	TAG_TYPE_COMPONENT:0, // 组件tag
 	TAG_TYPE_PAGE:1,      // 页面tag

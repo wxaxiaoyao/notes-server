@@ -93,7 +93,7 @@ module.exports = app => {
 	router.resources(`${prefix}issues`, issue);
 
 	const order = controller.order;
-	router.post(`${prefix}orders/pingpp`, order.pingpp);
+	router.post(`${prefix}orders/charge`, order.charge);
 	router.resources(`${prefix}orders`, order);
 
 	const trade = controller.trade;

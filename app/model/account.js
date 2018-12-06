@@ -53,6 +53,15 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 
+	model.getByUserId = async function(userId) {
+		const account = await app.model.accounts.findOne({where:{userId}}).then(o => o && o.toJSON());
+		if (!account) {
+			return await app.model.accounts.create({userId}).then(o => o && o.toJSON());
+		}
+
+		return account;
+	}
+
 	app.model.accounts = model;
 	return model;
 };

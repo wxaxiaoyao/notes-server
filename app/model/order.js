@@ -26,8 +26,13 @@ module.exports = app => {
 			unique: true,
 		},
 
-		amount: {
+		amount: {                 // 金额
 			type: INTEGER,
+		},
+
+		count: {                 // 购买数量
+			type: INTEGER,
+			defaultValue: 1,
 		},
 
 		goodsId: {
