@@ -3,6 +3,7 @@ const _ = require("lodash");
 const Hashes = require("jshashes");
 const uuidv1 = require("uuid/v1");
 const md5 = require("blueimp-md5");
+const crypto = require("crypto");
 
 const sha1 = new Hashes.SHA1().setUTF8(true);
 
@@ -93,6 +94,14 @@ util.getFileType = function(filename) {
 	if (_.endsWith(filename, "/")) return "folders";
 	const ext = _.toLower(filename.substring(filename.lastIndexOf(".")));
 	return filetypes[ext] || "files";
+}
+
+util.rsaEncrypt = function(prvKey, message) {
+	return crypto.privateEncrypt(prvKey, Buffer.from(message, "utf8")).toString("hex");
+}
+
+util.rsaDecrypt = function(pubKey, sig) {
+	return crypto.publicDecrypt(pubKey, Buffer.from(sig, "hex")).toString("utf8");
 }
 
 module.exports = util;

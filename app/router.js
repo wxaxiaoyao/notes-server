@@ -92,6 +92,14 @@ module.exports = app => {
 	router.get(`${prefix}issues/statistics`, issue.statistics);
 	router.resources(`${prefix}issues`, issue);
 
+	const discount = controller.discount;
+	router.resources(`${prefix}/discounts`, discount);
+
+	const goods = controller.goods;
+	router.get(`${prefix}/goods`, goods.index);
+	router.get(`${prefix}/goods/:id/detail`, goods.detail);
+	//router.resources(`${prefix}/goods`, goods);
+
 	const order = controller.order;
 	router.post(`${prefix}orders/charge`, order.charge);
 	router.resources(`${prefix}orders`, order);

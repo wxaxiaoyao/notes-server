@@ -67,8 +67,10 @@ class BaseController extends Controller {
 		return this.app.log;
 	}
 
-	validate(schema = {}, options = {allowUnknown:true}) {
-		const params = this.getParams();
+	validate(schema, data, options = {allowUnknown:true}) {
+		const params = data || this.getParams();
+
+		schema = schema || {};
 
 		_.each(schema, (val, key) => {
 			schema[key] = rules[val] || val;

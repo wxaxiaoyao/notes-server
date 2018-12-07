@@ -68,6 +68,10 @@ module.exports = {
 	// 申请类型
 	APPLY_TYPE_MEMBER:0,     // 成员申请
 
+	DISCOUNT_STATE_UNUSE: 0,    // 未使用 0 
+	DISCOUNT_STATE_USED: 1,     // 已使用 1
+	DISCOUNT_STATE_EXPIRED: 2,  // 已过期 2
+
 	                       // 订单状态
 	ORDER_STATE_START:0,   // 订单开始
 	ORDER_STATE_PAYING:1,  // 订单进行中
