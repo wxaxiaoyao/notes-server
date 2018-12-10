@@ -106,27 +106,26 @@ const User = class extends Controller {
 		const {ctx, model, util} = this;
 		const config = this.config.self;
 		const reserveUsernames = ["system", "note", "www"];
-		const usernameReg = /^[\w\d]+$/;
-		const params = this.validate({
+		const usernameReg = /^\w[\w\d]+$/;
+		let {username, password} = this.validate({
 			"username":"string",
 			"password":"string",
 		});
 
-		if (_.indexOf(reserveUsernames, params.username) >= 0) this.throw(400, "用户名已注册");
+		username = username.toLowerCase();
 
-		if (!usernameReg.test(params.username)) ctx.throw(400);
+		if (_.indexOf(reserveUsernames, username) >= 0) this.fail(3);
+		if (!usernameReg.test(username) || username.length < 4 || username.length > 32) this.fail(2);
 
-		let user = await model.users.getByName(params.username);
-		if (user) return ctx.throw(400, "用户已存在");
+		let user = await model.users.getByName(username);
+		if (user) return this.fail(3);
 
 		user = await model.users.create({
-			username: params.username,
-			password: params.password,
-		});
-
-		if (!user) return ctx.throw(500);
-
-		user = user.get({plain:true});
+			portrait: "http://statics.qiniu.wxaxiaoyao.cn/_/portraits/" + username[0] + _.random(1,4) + ".png",
+			username: username,
+			password: password,
+		}).then(o => o && o.toJSON());
+		if (!user) return this.fail(0);
 
 		// 创建用户账号记录
 		await this.model.accounts.upsert({userId: user.id});
