@@ -23,7 +23,7 @@ module.exports = app => {
   		url:config.gitlab.url,
   	});
   
-    console.log(app.config.self);
+    //console.log(app.config.self);
   
     sms(app);
     email(app);

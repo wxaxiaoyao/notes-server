@@ -32,3 +32,8 @@ exports.io = {
 		},
 	}
 }
+
+exports.multipart = {
+	mode:"stream",
+	whitelist: filename => true,
+}

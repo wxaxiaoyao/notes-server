@@ -61,6 +61,7 @@ module.exports = app => {
 	router.resources(`${prefix}domains`, domain);
 
 	const file = controller.file;
+	router.post(`${prefix}files/upload`, file.upload);
 	router.get(`${prefix}files/statistics`, file.statistics);
 	router.get(`${prefix}files/rawurl`, file.rawurl);
 	router.post(`${prefix}files/upsert`, file.upsert);

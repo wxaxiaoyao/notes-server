@@ -1,6 +1,8 @@
-
+const path = require("path");
 const _ = require("lodash");
 const Controller = require("../core/controller.js");
+const uuidv1 = require('uuid/v1');
+const qiniu = require("qiniu");
 
 const File = class extends Controller {
 	get modelName() {
@@ -122,6 +124,41 @@ const File = class extends Controller {
 		const data = await this.model.files.statistics(userId);
 
 		return this.success(data);
+	}
+
+	async upload() {
+		//const {username} = this.authenticated();
+		const username = "xiaoyao";
+		const stream = await this.ctx.getFileStream();
+		const key = username + "/" +  uuidv1() + "." + path.basename(stream.mime);
+		const accessKey = this.config.self.qiniu.accessKey;
+		const secretKey = this.config.self.qiniu.secretKey;
+		const bucketName = this.config.self.qiniu.publicBucketName;
+		const bucketDomain = this.config.self.qiniu.publicBucketDomain;
+
+		const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+		const putPolicy = new qiniu.rs.PutPolicy({scope: bucketName + ":" + key});
+		const token = putPolicy.uploadToken(mac);
+
+		const putExtra = new qiniu.form_up.PutExtra();
+		const config = new qiniu.conf.Config();
+		config.zone = qiniu.zone.Zone_z2; // 华南
+
+		console.log(typeof(stream), stream);
+		const ok = await new Promise((resolve, reject) => {
+			const formUploader = new qiniu.form_up.FormUploader(config);
+			formUploader.putStream(token, key, stream, putExtra, function(respErr, respBody, respInfo){
+				if (respErr || respInfo.statusCode != 200) {
+					//console.log(respErr, respInfo.statusCode, respBody);
+					return resolve(false);
+				} 
+				return resolve(true);
+			});
+		});
+
+		const url = bucketDomain + "/" +  key;
+
+		return this.success(ok ? {url} : {});
 	}
 }
 
