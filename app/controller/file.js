@@ -127,10 +127,9 @@ const File = class extends Controller {
 	}
 
 	async upload() {
-		//const {username} = this.authenticated();
-		const username = "xiaoyao";
+		const {userId} = this.authenticated();
 		const stream = await this.ctx.getFileStream();
-		const key = username + "/" +  uuidv1() + "." + path.basename(stream.mime);
+		const key = userId + "/" +  uuidv1() + "." + path.basename(stream.mime);
 		const accessKey = this.config.self.qiniu.accessKey;
 		const secretKey = this.config.self.qiniu.secretKey;
 		const bucketName = this.config.self.qiniu.publicBucketName;
@@ -156,9 +155,11 @@ const File = class extends Controller {
 			});
 		});
 
+		if (!ok) return this.throw(500, "上传文件到七牛失败");
+
 		const url = bucketDomain + "/" +  key;
 
-		return this.success(ok ? {url} : {});
+		return this.success(url);
 	}
 }
 
