@@ -3,15 +3,10 @@ const _ = require("lodash");
 
 module.exports = app => {
 	return async (ctx, next) => {
-		const {app, socket, logger, helper} = ctx;
-		const config = app.config.self;
-		const id = socket.id;
-		const query = socket.handshake.query;
-		const {token, userId} = query;
+		const token = ctx.socket.handshake.query.token;
+		const user = app.util.jwt_decode(token || "", app.config.self.secret, true) || {};
 
-		const user = app.util.jwt_decode(token || "", config.secret, true) || {};
-
-		if (user.userId == undefined || user.userId != userId) {
+		if (user.userId == undefined) {
 			// 未认证
 			console.log("未认证, 关闭套接字");
 			socket.disconnect(true);
@@ -19,7 +14,7 @@ module.exports = app => {
 			return;
 		}
 
-		socket.join(_.toString(userId));
+		ctx.socket.join(_.toString(user.userId));
 	
 		await next();
 	}
