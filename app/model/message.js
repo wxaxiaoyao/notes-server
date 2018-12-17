@@ -23,6 +23,21 @@ module.exports = app => {
 			allowNull: false, 
 		},
 
+		username: {           // 用户名
+			type: STRING,
+			defaultValue:"",
+		},
+
+		nickname: {           // 昵称
+			type:STRING,
+			defaultValue:"",
+		},
+
+		portrait: {           // 头像
+			type: STRING,
+			defaultValue: "",
+		},
+
 		sessionId: {          // 会话id  0 -- 系统会话
 			type: STRING,
 			allowNull:  false,
