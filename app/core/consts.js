@@ -108,6 +108,9 @@ module.exports = {
 	BUG_STATE_PASS:3,     // 测试通过
 	BUG_STATE_NOPASS:4,   // 测试不通过
 	BUG_STATE_CLOSE:5,    // 关闭结束
+
+	VERSION_TYPE_ANDROID: 0,  // android类型
+	VERSION_TYPE_IOS: 1,      // iOS类型
 }
 
 

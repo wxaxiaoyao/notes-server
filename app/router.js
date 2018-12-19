@@ -195,6 +195,9 @@ module.exports = app => {
 	//router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
+	const version = controller.version;
+	router.resources(`${prefix}versions`, version);
+
 
 	// socket io router
 	io.of("/").route("pull_sessions", io.controller.chat.pullSessions);
