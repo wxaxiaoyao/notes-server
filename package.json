@@ -22,6 +22,7 @@
     "egg-scripts": "^2.10.0",
     "egg-sequelize": "^4.2.0",
     "egg-socket.io": "^4.1.5",
+    "event-stream": "^4.0.1",
     "gitlab": "^4.2.1",
     "joi": "^13.4.0",
     "js-base64": "^2.4.9",

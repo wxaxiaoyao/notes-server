@@ -28,7 +28,7 @@ module.exports = app => {
 			defaultValue:0,
 		},
 
-		version: {                      // 版本名
+		versionName: {                  // 版本名
 			type: STRING,
 			defaultValue: "0.0.0",
 		},

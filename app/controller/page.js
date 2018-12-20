@@ -200,7 +200,12 @@ const Page = class extends Controller {
 
 		this.formatQuery(query);
 
-		const list = await this.model.pages.findAll({...this.queryOptions,exclude:["content"], query});
+		const list = await this.model.pages.findAll({
+			...this.queryOptions,
+			attributes: {
+				exclude:["content"],
+			},
+		   	query});
 
 		return this.success(list);	
 	}
