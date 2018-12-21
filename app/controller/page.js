@@ -205,7 +205,8 @@ const Page = class extends Controller {
 			attributes: {
 				exclude:["content"],
 			},
-		   	query});
+			where: query,
+		});
 
 		return this.success(list);	
 	}
