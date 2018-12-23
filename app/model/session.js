@@ -77,6 +77,9 @@ module.exports = app => {
 			unique: true,
 			fields: ["sessionId", "memberId"],
 		},
+		{
+			fields: ["members"],
+		},
 		],
 	});
 
@@ -95,16 +98,14 @@ module.exports = app => {
 		session.sessionId = sessionId;
 		
 		// 是否已存在会话
-		let sess = await app.model.sessions.findOne({where:{members: session.members, memberId: userId}});
-		if (!sess) {
-			const datas = [];
-			_.each(memberIds, memberId => datas.push({...session, memberId}));
-			await app.model.sessions.bulkCreate(datas);
-		} else {
-			sessionId = sess.sessionId;
-		}
+		let sess = await app.model.sessions.findOne({where:{members: session.members, memberId: userId}}).then(o => o && o.toJSON());
+
+		if (sess) return sess;
+		await app.model.sessions.bulkCreate(_.map(memberIds, memberId => {
+			return {...session, memberId};
+		}));
 		
-		return await this.getSessionsBySessionId(sessionId);
+		return await app.model.sessions.findOne({where:{members: session.members, memberId: userId}}).then(o => o && o.toJSON());
 	}
 
 	model.loadSessionMembers = async function(sessions) {

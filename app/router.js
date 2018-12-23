@@ -15,6 +15,7 @@ module.exports = app => {
 	router.get(`${prefix}users/:id/detail`, user.detail);
 	router.post(`${prefix}users/:id/contributions`, user.addContributions);
 	router.get(`${prefix}users/:id/contributions`, user.contributions);
+	router.post(`${prefix}users/search`, user.search);
 	router.post(`${prefix}users/register`, user.register);
 	router.post(`${prefix}users/login`, user.login);
 	router.post(`${prefix}users/logout`, user.logout);
@@ -113,9 +114,6 @@ module.exports = app => {
 	router.get(`${prefix}members/exist`, member.exist);
 	router.resources(`${prefix}members`, member);
 
-	const apply = controller.apply;
-	router.resources(`${prefix}applys`, apply);
-
 	const notification = controller.notification;
 	router.resources(`${prefix}notifications`, notification);
 
@@ -195,9 +193,18 @@ module.exports = app => {
 	//router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
+	// app版本
 	const version = controller.version;
 	router.resources(`${prefix}versions`, version);
 
+	// 联系人
+	const contact = controller.contact;
+	router.resources(`${prefix}contacts`, contact);
+
+	// 申请列表
+	const apply = controller.apply;
+	router.put(`${prefix}applies/:id/state`, apply.state);
+	router.resources(`${prefix}applies`, apply);
 
 	// socket io router
 	io.of("/").route("pull_sessions", io.controller.chat.pullSessions);

@@ -47,6 +47,7 @@ class Chat extends Controller {
 		const {userId} = this.authenticated();
 		const message = this.validate({sessionId:"string"});
 		const sessionId = message.sessionId;
+		console.log(message);
 
 		message.userId = userId;
 		message.state = 0;
@@ -54,14 +55,19 @@ class Chat extends Controller {
 		// 不记录系统会话消息
 		if (sessionId == "systemsession") return this.socket.emit("push_messages", message);
 
-		let session = this.model.sessions.findOne({where:{sessionId, memberId:userId}});
+		let session = await this.model.sessions.findOne({where:{sessionId, memberId:userId}}).then(o => o && o.toJSON());
 		if (!session) return this.throw(400, "会话不存在");
 
 		await this.model.sessions.increment({unreadMsgCount:1}, {where:{sessionId, memberId:{[this.model.Op.ne]:userId}}});
 		let msg = await this.model.messages.create(message);
 		msg = msg.get({plain:true});
 
-		nsp.to(sessionId).emit("push_messages", msg);
+		console.log(session);
+		//nsp.to(sessionId).emit("push_messages", msg);
+		_.each(session.members.split("|").filter(o => o), memberId => {
+			if (memberId == userId) return;
+			nsp.to(memberId).emit("push_messages", msg);
+		});
 
 		return this.success(msg);
 	}
@@ -71,7 +77,7 @@ class Chat extends Controller {
 		const {userId} = this.authenticated();
 		const {sessionId} = this.validate({sessionId:"string"});
 
-		let session = this.model.sessions.findOne({where:{sessionId, memberId:userId}});
+		let session = await this.model.sessions.findOne({where:{sessionId, memberId:userId}}).then(o => o && o.toJSON());
 		if (!session) return this.throw(400, "会话不存在");
 
 		await this.model.sessions.update({unreadMsgCount:0}, {where:{sessionId, memberId:userId}});

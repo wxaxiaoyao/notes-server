@@ -9,6 +9,7 @@ const axios = require('./app/core/axios.js');
 const qiniu = require('./app/core/qiniu.js');
 const pingpp = require('./app/core/pingpp.js');
 const model = require('./app/core/model.js');
+const association = require("./app/core/association.js");
 //const ahocorasick = require('./app/core/ahocorasick.js');
 const log = require("./app/core/log.js");
 
@@ -31,6 +32,7 @@ module.exports = app => {
     qiniu(app);
     model(app);
     //ahocorasick(app);
+	association(app);   // 定义模型关系
     log(app);
   
     //console.log(app.config.env);

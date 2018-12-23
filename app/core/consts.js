@@ -26,6 +26,14 @@ module.exports = {
 	ENTITY_TYPE_GROUP:3,       // 组
 	ENTITY_TYPE_ISSUE:4,       // 问题
 	ENTITY_TYPE_PROJECT:5,     // 项目
+	
+	// 对象类型
+	OBJECT_TYPE_USER:0,        // 用户类型
+	OBJECT_TYPE_SITE:1,        // 站点类型
+	OBJECT_TYPE_PAGE:2,        // 页面类型
+	OBJECT_TYPE_GROUP:3,       // 组
+	OBJECT_TYPE_ISSUE:4,       // 问题
+	OBJECT_TYPE_PROJECT:5,     // 项目
 
 	// 对象可见性
 	ENTITY_VISIBILITY_PUBLIC:0,   // 公开

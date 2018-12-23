@@ -46,18 +46,22 @@ module.exports = app => {
 
 		nickname: {
 			type: STRING(48),
+			defaultValue:"",
 		},
 
 		portrait: {
 			type: STRING(128),
+			defaultValue:"",
 		},
 
 		sex: {
 			type: STRING(4),
+			defaultValue:"男",
 		},
 
 		description: {
 			type: STRING(128),
+			defaultValue:"",
 		},
 
 	}, {

@@ -4,14 +4,16 @@ const _ = require("lodash");
 
 const Controller = require("../core/controller.js");
 const {
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
-	ENTITY_TYPE_GROUP,
-	ENTITY_TYPE_PROJECT,
+	OBJECT_TYPE_USER,
+	OBJECT_TYPE_SITE,
+	OBJECT_TYPE_PAGE,
+	OBJECT_TYPE_GROUP,
+	OBJECT_TYPE_PROJECT,
 
+	APPLY_STATE_DEFAULT,
 	APPLY_STATE_AGREE,
 	APPLY_STATE_REFUSE,
+
 	APPLY_TYPE_MEMBER,
 } = require("../core/consts.js");
 
@@ -21,13 +23,23 @@ const Apply = class extends Controller {
 	}
 
 	async index() {
-		const params = this.validate({
-			objectType: joi.number().valid(ENTITY_TYPE_PROJECT),
+		const {objectType, objectId, applyType} = this.validate({
+			objectType: joi.number().valid([OBJECT_TYPE_USER]),
 			objectId: "int",
-			applyType:"int",
+			applyType: joi.number().valid([APPLY_TYPE_MEMBER]),
 		});
+		const models = {
+			[APPLY_TYPE_MEMBER]: {
+				as:"apply",
+				attributes: ["id", "username", "nickname", "portrait"],
+				model: this.model.users,
+			},
+		};
 
-		const list = await this.model.applies.getObjectApplies(params.objectId, params.objectType, params.applyType);
+		const list = await this.model.applies.findAll({
+			where: {objectType, objectId, applyType},
+			include: [models[applyType]],
+		});
 
 		return this.success(list);
 	}
@@ -35,34 +47,51 @@ const Apply = class extends Controller {
 	async create() {
 		const {userId} = this.authenticated();
 		const params = this.validate({
-			objectType: joi.number().valid(ENTITY_TYPE_PROJECT),
+			objectType: joi.number().valid([OBJECT_TYPE_USER]),
 			objectId: "int",
-			applyType: joi.number().valid(APPLY_TYPE_MEMBER),
+			applyType: joi.number().valid([APPLY_TYPE_MEMBER]),
 			applyId: 'int',
 		});
-		params.userId = userId;
-		delete params.state;
+		params.state = APPLY_STATE_DEFAULT;
 
-		const data = await this.model.applies.create(params);
-		if (!data) this.throw(400);
-
-		return this.success(data);
+		await this.model.applies.upsert(params);
+		return this.success("OK");
 	}
 
-	async update() {
+	async state() {
 		const {userId} = this.authenticated();
-		const {id, state} = this.validate({id:"int", state:"int"});
-		let ok = 0;
+		const {id, state} = this.validate({
+			id:"int", 
+			state:joi.number().valid([APPLY_STATE_REFUSE, APPLY_STATE_AGREE]),
+		});
+		const apply = await this.model.applies.findOne({where:{id}}).then(o => o && o.toJSON());
+		if (!apply) return this.throw(400);
 
-		if (state == APPLY_STATE_AGREE) {
-			ok = await this.model.applies.agree(id, userId);
-		} else if(state == APPLY_STATE_REFUSE) {
-			ok = await this.model.applies.refuse(id, userId);
+		// 安全性验证
+		if (apply.objectType == OBJECT_TYPE_USER) {
+			if (apply.objectId != userId) return this.throw(401);
 		}
 
-		if (ok != 0) this.throw(400);
+		// 更新状态
+		await this.model.applies.update({state}, {where:{id}});
+		// 拒绝直接返回
+		if (state == APPLY_STATE_REFUSE) return this.success();
 
-		return this.success("OK");
+		// 同意
+		if (apply.objectType == OBJECT_TYPE_USER) {
+			if (apply.applyType == APPLY_TYPE_MEMBER) {
+				await this.model.contacts.upsert({
+					userId: apply.objectId,
+					contactId: apply.applyId,
+				});
+				await this.model.contacts.upsert({
+					userId: apply.applyId,
+					contactId: apply.objectId,
+				});
+			}
+		}
+
+		return this.success();
 	}
 }
 

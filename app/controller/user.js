@@ -107,7 +107,7 @@ const User = class extends Controller {
 		const config = this.config.self;
 		const reserveUsernames = ["system", "note", "www"];
 		const usernameReg = /^\w[\w\d]+$/;
-		let {username, password} = this.validate({
+		let {username, password, nickname} = this.validate({
 			"username":"string",
 			"password":"string",
 		});
@@ -124,6 +124,7 @@ const User = class extends Controller {
 			portrait: "http://statics.qiniu.wxaxiaoyao.cn/_/portraits/" + username[0] + _.random(1,4) + ".png",
 			username: username,
 			password: password,
+			nickname: nickname || username,
 		}).then(o => o && o.toJSON());
 		if (!user) return this.fail(0);
 

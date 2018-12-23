@@ -31,11 +31,6 @@ module.exports = app => {
 			primaryKey: true,
 		},
 		
-		userId: {                    // 所属者 记录创建者
-			type: BIGINT,
-			allowNull: false,
-		},
-
 		objectType: {                // 所属对象类型  0 -- 用户  1 -- 站点  2 -- 页面
 			type: INTEGER,
 			allowNull: false,
@@ -75,6 +70,13 @@ module.exports = app => {
 		underscored: false,
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',
+
+		indexes: [
+		{
+			unique: true,
+			fields: ["objectId", "objectType", "applyType", "applyId"],
+		},
+		],
 	});
 
 	//model.sync({force:true}).then(() => {

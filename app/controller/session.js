@@ -32,7 +32,6 @@ const Session = class extends Controller {
 
 		const session = await this.model.sessions.createSession({...params, userId});
 
-
 		return this.success(session);
 	}
 
