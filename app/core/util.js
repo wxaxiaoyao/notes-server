@@ -1,5 +1,6 @@
 const jwt = require("jwt-simple");
 const _ = require("lodash");
+const qrcode = require("qrcode");
 const Hashes = require("jshashes");
 const uuidv1 = require("uuid/v1");
 const md5 = require("blueimp-md5");
@@ -102,6 +103,14 @@ util.rsaEncrypt = function(prvKey, message) {
 
 util.rsaDecrypt = function(pubKey, sig) {
 	return crypto.publicDecrypt(pubKey, Buffer.from(sig, "hex")).toString("utf8");
+}
+
+util.qrcode = async text => {
+	try {
+		return await qrcode.toDataURL(text);
+	} catch(e) {
+		return ;
+	}
 }
 
 module.exports = util;

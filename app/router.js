@@ -27,6 +27,7 @@ module.exports = app => {
 	router.get(`${prefix}users/cellphone_captcha`, user.cellphoneVerifyOne);
 	router.post(`${prefix}users/cellphone_captcha`, user.cellphoneVerifyTwo);
 	router.get(`${prefix}users/contacts`, user.contacts);
+	router.get(`${prefix}users/qr`, user.qr);
 	router.resources(`${prefix}users`, user);
 
 	const site = controller.site;

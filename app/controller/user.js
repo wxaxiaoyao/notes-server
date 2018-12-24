@@ -331,6 +331,17 @@ const User = class extends Controller {
 
 		return this.success(users);
 	}
+
+	// 用户二维码名片
+	async qr() {
+		const {userId} = this.authenticated();
+		const info = {userId, type: 0};  // 0 -- 添加用户类型
+		const qr = await this.app.util.qrcode(JSON.stringify(info));
+
+		if (!qr) return this.throw(500, "生成二维码失败");
+
+		return this.success(qr);
+	}
 }
 
 module.exports = User;
