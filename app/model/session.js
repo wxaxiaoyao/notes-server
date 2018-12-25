@@ -96,6 +96,7 @@ module.exports = app => {
 		memberIds = _.sortBy(_.uniq(memberIds));
 		session.members = "|" + memberIds.join("|") + "|";
 		session.sessionId = sessionId;
+		session.title = session.title || ("群聊(" + memberIds.length + ")");
 		
 		// 是否已存在会话
 		let sess = await app.model.sessions.findOne({where:{members: session.members, memberId: userId}}).then(o => o && o.toJSON());
