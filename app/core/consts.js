@@ -119,6 +119,9 @@ module.exports = {
 
 	VERSION_TYPE_ANDROID: 0,  // android类型
 	VERSION_TYPE_IOS: 1,      // iOS类型
+
+	CLASSIFY_TAG_DEFAULT:0,   // 默认 未分类
+	CLASSIFY_TAG_CONTACT:1,   // 联系人tag
 }
 
 

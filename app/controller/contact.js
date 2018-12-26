@@ -4,7 +4,7 @@ const Controller = require("../core/controller.js");
 
 const Contact = class extends Controller {
 	get modelName() {
-		return "versions";
+		return "contacts";
 	}
 
 	async index() {

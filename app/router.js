@@ -207,6 +207,10 @@ module.exports = app => {
 	router.put(`${prefix}applies/:id/state`, apply.state);
 	router.resources(`${prefix}applies`, apply);
 
+	// 分类tag
+	const classifyTag = controller.classifyTag;
+	router.resources(`${prefix}classifyTags`, classifyTag);
+
 	// socket io router
 	io.of("/").route("pull_sessions", io.controller.chat.pullSessions);
 	io.of("/").route("push_sessions", io.controller.chat.pushSessions);
