@@ -209,6 +209,7 @@ module.exports = app => {
 
 	// 分类tag
 	const classifyTag = controller.classifyTag;
+	router.post(`${prefix}classifyTags/set_tags`, classifyTag.setTags);
 	router.resources(`${prefix}classifyTags`, classifyTag);
 
 	// socket io router
