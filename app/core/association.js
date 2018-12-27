@@ -4,6 +4,8 @@ module.exports = app => {
 	const contacts = app.model.contacts;
 	const applies = app.model.applies;
 	const sessions = app.model.sessions;
+	const classifyTags = app.model.classifyTags;
+	const objectTags = app.model.objectTags;
 
 	 //一个用户有多个联系人
 	users.hasMany(contacts, {
@@ -48,6 +50,16 @@ module.exports = app => {
 	sessions.belongsTo(users, {
 		foreignKey: "memberId",
 		targetKey:"id",
+	});
+
+	classifyTags.hasMany(objectTags, {
+		foreignKey: "classifyTagId",
+		sourceKey: "id",
+	});
+	
+	objectTags.belongsTo(classifyTags, {
+		foreignKey: "classifyTagId",
+		targetKey: "id",
 	});
 
 	//users.hasOne(accounts, {

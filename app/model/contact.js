@@ -48,11 +48,6 @@ module.exports = app => {
 			defaultValue:0,
 		},
 
-		tags: {
-			type: JSON,
-			defaultValue: [],
-		},
-
 		extra: {                         // 附加信息
 			type:JSON,
 			defaultValue: {},
