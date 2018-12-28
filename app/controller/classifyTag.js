@@ -30,13 +30,16 @@ const classifyTag = class extends Controller {
 			id: "int",
 		});
 
+		await this.model.objectTags.destroy({where:{classifyTagId:id, userId}});
+		const objectTags = [];
 		for (let i = 0; i < objectIds.length; i++) {
-			await this.model.objectTags.upsert({
+			objectTags.push({
 				userId,
 				classifyTagId:id,
 				objectId: objectIds[i],
 			});
 		}
+		await this.model.objectTags.bulkCreate(objectTags);
 
 		return this.success();
 	}
