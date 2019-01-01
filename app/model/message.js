@@ -63,6 +63,11 @@ module.exports = app => {
 			defaultValue: "",
 		},
 
+		url: {                // 文件地址
+			type: STRING,
+			defaultValue:"",
+		},
+
 		extra: {
 			type: JSON,
 			defaultValue: {},

@@ -161,6 +161,43 @@ const File = class extends Controller {
 
 		return this.success(url);
 	}
+
+	async sessionUpload() {
+		const {userId} = this.authenticated();
+		const stream = await this.ctx.getFileStream();
+		const key = userId + "/" +  uuidv1() + "." + path.basename(stream.mime);
+		const accessKey = this.config.self.qiniu.accessKey;
+		const secretKey = this.config.self.qiniu.secretKey;
+		const bucketName = this.config.self.qiniu.publicBucketName;
+		const bucketDomain = this.config.self.qiniu.publicBucketDomain;
+
+		const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+		const putPolicy = new qiniu.rs.PutPolicy({scope: bucketName + ":" + key});
+		const token = putPolicy.uploadToken(mac);
+
+		const putExtra = new qiniu.form_up.PutExtra();
+		const config = new qiniu.conf.Config();
+		config.zone = qiniu.zone.Zone_z2; // 华南
+
+		console.log(typeof(stream), stream);
+		const ok = await new Promise((resolve, reject) => {
+			const formUploader = new qiniu.form_up.FormUploader(config);
+			formUploader.putStream(token, key, stream, putExtra, function(respErr, respBody, respInfo){
+				if (respErr || respInfo.statusCode != 200) {
+					//console.log(respErr, respInfo.statusCode, respBody);
+					return resolve(false);
+				} 
+				return resolve(true);
+			});
+		});
+
+		if (!ok) return this.throw(500, "上传文件到七牛失败");
+
+		const url = bucketDomain + "/" +  key;
+
+		return this.success(url);
+		
+	}
 }
 
 module.exports = File;

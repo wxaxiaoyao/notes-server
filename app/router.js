@@ -63,6 +63,7 @@ module.exports = app => {
 	router.resources(`${prefix}domains`, domain);
 
 	const file = controller.file;
+	router.post(`${prefix}files/sessionUpload`, file.sessionUpload);
 	router.post(`${prefix}files/upload`, file.upload);
 	router.get(`${prefix}files/statistics`, file.statistics);
 	router.get(`${prefix}files/rawurl`, file.rawurl);
@@ -212,6 +213,12 @@ module.exports = app => {
 	router.post(`${prefix}classifyTags/:id/set_objects`, classifyTag.setObjects);
 	router.post(`${prefix}classifyTags/set_tags`, classifyTag.setTags);
 	router.resources(`${prefix}classifyTags`, classifyTag);
+
+	// 位置信息
+	const locations = controller.location;
+	router.get(`${prefix}locations/nearby`, locations.getNearBy);
+	router.post(`${prefix}locations/upsert`, locations.upsert);
+	router.resources(`${prefix}locations`, locations);
 
 	// socket io router
 	io.of("/").route("pull_sessions", io.controller.chat.pullSessions);
