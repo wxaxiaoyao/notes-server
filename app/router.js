@@ -220,6 +220,18 @@ module.exports = app => {
 	router.post(`${prefix}locations/upsert`, locations.upsert);
 	router.resources(`${prefix}locations`, locations);
 
+	// 知识
+	const knowledge = controller.knowledge;
+	router.resources(`${prefix}knowledges`, knowledge);
+
+	// 知识包
+	const knowledgePackage = controller.knowledgePackage;
+	router.resources(`${prefix}knowledgePackages`, knowledgePackage);
+
+	// 知识域
+	const knowledgeArea = controller.knowledgeArea;
+	router.resources(`${prefix}knowledgeAreas`, knowledgeArea);
+
 	// socket io router
 	io.of("/").route("pull_sessions", io.controller.chat.pullSessions);
 	io.of("/").route("push_sessions", io.controller.chat.pushSessions);
