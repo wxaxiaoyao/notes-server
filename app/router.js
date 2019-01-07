@@ -232,6 +232,14 @@ module.exports = app => {
 	const knowledgeArea = controller.knowledgeArea;
 	router.resources(`${prefix}knowledgeAreas`, knowledgeArea);
 
+	// 便条 随手记
+	const note = controller.note;
+	router.resources(`${prefix}notes`, note);
+
+	// 便条包
+	const notePackage = controller.notePackage;
+	router.resources(`${prefix}notePackages`, notePackage);
+
 	// socket io router
 	io.of("/").route("pull_sessions", io.controller.chat.pullSessions);
 	io.of("/").route("push_sessions", io.controller.chat.pushSessions);

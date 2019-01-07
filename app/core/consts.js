@@ -123,6 +123,7 @@ module.exports = {
 	CLASSIFY_TAG_DEFAULT:0,   // 默认 未分类
 	CLASSIFY_TAG_CONTACT:1,   // 联系人tag
 	CLASSIFY_TAG_KNOWLEDGE:2, // 知识tag
+	CLASSIFY_TAG_NOTE:3,      // 便条tag
 }
 
 
