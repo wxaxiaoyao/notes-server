@@ -17,6 +17,38 @@ const Admin = class extends Controller {
 		return params;
 	}
 	
+	async login() {
+		const config = this.app.config.self;
+		const util = this.app.util;
+		let {username, password} = this.validate({
+			"username":"string",
+			"password":"string",
+		});
+		username = username.toLowerCase();
+
+		let user = await this.model.admins.findOne({
+			where: {
+				[this.model.Op.or]: [{username: username}, {cellphone:username}, {email: username}],
+				//password: this.app.util.md5(password),
+				password,
+			},
+		});
+
+		if (!user) return this.fail(1);
+		user = user.get({plain:true});
+
+		const tokenExpire = 3600 * 24 * 2;
+		const token = util.jwt_encode({
+			userId: user.id, 
+			roleId: user.roleId,
+			username: user.username
+		}, config.adminSecret, tokenExpire);
+
+		user.token = token;
+
+		return this.success(user);
+	}
+
 	async query() {
 		this.adminAuthenticated();
 
@@ -47,7 +79,7 @@ const Admin = class extends Controller {
 
 		this.formatQuery(query);
 
-		const list = await this.resource.findAll({...this.queryOptions, where:query});
+		const list = await this.resource.findAndCount({...this.queryOptions, where:query});
 
 		this.success(list);
 	}

@@ -4,6 +4,9 @@ use note;
 
 use `note`;
 
+create table admins like users;
+insert into admins select * from users where username="xiaoyao";
+select * from admins;
 select * from apiConfigs;
 select * from apis;
 select * from pages;
@@ -19,8 +22,13 @@ select * from contacts;
 select * from sessions;
 select * from messages;
 select * from classifyTags;
+select * from objectTags;
+select * from notes;
 select * from locations;
 select count(*) from pages;
+
+delete from objectTags where id > 0;
+delete from `classifyTags` where id > 0;
 
 update applies set state = 0 where id = 1;
 select md5("wuxiangan");

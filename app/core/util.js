@@ -39,6 +39,10 @@ util.hash = function(content) {
 	return sha1.hex(text);
 }
 
+util.md5 = function(str) {
+	return md5(str);
+}
+
 util.jwt_encode = function(payload, key, expire = 3600 * 24 * 100) {
 	payload = payload || {};
 	payload.exp = Date.now() / 1000 + expire;

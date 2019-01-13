@@ -11,55 +11,81 @@ module.exports = app => {
 	users.hasMany(contacts, {
 		foreignKey: "contactId",
 		sourceKey: "id",
+		constraints: false,
 	});
 
 	// 一个联系只属于一个用户
 	contacts.belongsTo(users, {
 		foreignKey:"contactId",
 		targetKey:"id",
+		constraints: false,
 	});
 
 	users.hasMany(applies, {
 		//as: "apply",
 		foreignKey:"applyId",
 		sourceKey:"id",
+		constraints: false,
 	});
 
 	applies.belongsTo(users, {
 		as: "apply",
 		foreignKey:"applyId",
 		targetKey:"id",
+		constraints: false,
 	});
 
 	users.hasMany(applies, {
 		foreignKey:"objectId",
 		sourceKey:"id",
+		constraints: false,
 	});
 
 	applies.belongsTo(users, {
 		as: "user",
 		foreignKey:"objectId",
 		targetKey:"id",
+		constraints: false,
 	});
 
 	users.hasMany(sessions, {
 		foreignKey:"memberId",
 		sourceKey:"id",
+		constraints: false,
 	});
 
 	sessions.belongsTo(users, {
 		foreignKey: "memberId",
 		targetKey:"id",
+		constraints: false,
 	});
 
 	classifyTags.hasMany(objectTags, {
+		as: "objectTags",
 		foreignKey: "classifyTagId",
 		sourceKey: "id",
+		constraints: false,
 	});
 	
 	objectTags.belongsTo(classifyTags, {
+		as: "classifyTags",
 		foreignKey: "classifyTagId",
 		targetKey: "id",
+		constraints: false,
+	});
+
+	app.model.notes.hasMany(app.model.objectTags, {
+		as: 'objectTags',
+		foreignKey: "objectId",
+		sourceKey:"id",
+		constraints: false,
+	});
+
+	app.model.objectTags.belongsTo(app.model.notes, {
+		as: "notes",
+		foreignKey: "objectId",
+		sourceKey: "id",
+		constraints: false,
 	});
 
 	//users.hasOne(accounts, {

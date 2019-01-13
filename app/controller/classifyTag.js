@@ -16,6 +16,7 @@ const classifyTag = class extends Controller {
 			where: {...params, userId},
 			include: [
 			{
+				as: "objectTags",
 				model: this.model.objectTags,
 			}
 			],

@@ -190,8 +190,8 @@ module.exports = app => {
 	router.resources(`${prefix}qinius`, qiniu.token);
 
 	const admin = controller.admin;
-	//router.post(`${prefix}admins/query`, admin.query);
-	//router.post(`${prefix}admins/login`, admin.login);
+	router.post(`${prefix}admins/query`, admin.query);
+	router.post(`${prefix}admins/login`, admin.login);
 	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
