@@ -42,6 +42,17 @@ const Note = class extends Controller {
 		return this.success(list);
 	}
 
+	async setTags() {
+		const {userId} = this.authenticated();
+		const {id, tags} = this.validate();
+		await this.model.query(`delete objectTags from objectTags, classifyTags where objectTags.classifyTagId = classifyTags.id and classifyTags.classify = ${CLASSIFY_TAG_NOTE} and objectTags.objectId = ${id}`);
+
+		const list = _.map(tags, o => ({userId, objectId:id, classifyTagId: o.id}));
+		const res = await this.model.objectTags.bulkCreate(list);
+
+		return this.success(res);
+	}
+
 	async create() {
 		const {userId} = this.authenticated();
 		const params = this.validate();
@@ -67,9 +78,9 @@ const Note = class extends Controller {
 		const id = params.id;
 
 		await this.model.notes.update(params, {where:{id, userId}});
-		await this.model.query(`delete objectTags from objectTags, classifyTags where objectTags.classifyTagId = classifyTags.id and classifyTags.classify = ${CLASSIFY_TAG_NOTE} and objectTags.objectId = ${id}`);
 
 		if (params.classifyTags) {
+			await this.model.query(`delete objectTags from objectTags, classifyTags where objectTags.classifyTagId = classifyTags.id and classifyTags.classify = ${CLASSIFY_TAG_NOTE} and objectTags.objectId = ${id}`);
 			const list = [];
 			_.each(params.classifyTags, o => list.push({userId, objectId:id, classifyTagId: o.id}));
 			await this.model.objectTags.bulkCreate(list);

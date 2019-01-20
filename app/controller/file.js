@@ -165,7 +165,7 @@ const File = class extends Controller {
 	async sessionUpload() {
 		const {userId} = this.authenticated();
 		const stream = await this.ctx.getFileStream();
-		const key = userId + "/" +  uuidv1() + "." + path.basename(stream.mime);
+		const key = userId + "/files/" +  uuidv1() + "." + path.basename(stream.mime);
 		const accessKey = this.config.self.qiniu.accessKey;
 		const secretKey = this.config.self.qiniu.secretKey;
 		const bucketName = this.config.self.qiniu.publicBucketName;

@@ -15,17 +15,18 @@ module.exports = app => {
 	router.get(`${prefix}users/:id/detail`, user.detail);
 	router.post(`${prefix}users/:id/contributions`, user.addContributions);
 	router.get(`${prefix}users/:id/contributions`, user.contributions);
+	router.post(`${prefix}users/captcha`, user.captcha);
 	router.post(`${prefix}users/search`, user.search);
 	router.post(`${prefix}users/register`, user.register);
 	router.post(`${prefix}users/login`, user.login);
+	router.post(`${prefix}users/cellphone_login`, user.cellphoneLogin);
 	router.post(`${prefix}users/logout`, user.logout);
 	router.get(`${prefix}users/profile`, user.profile);
 	router.post(`${prefix}users/changepwd`, user.changepwd);
 	router.post(`${prefix}users/confirmpwd`, user.confirmpwd);
 	router.get(`${prefix}users/email_captcha`, user.emailVerifyOne);
 	router.post(`${prefix}users/email_captcha`, user.emailVerifyTwo);
-	router.get(`${prefix}users/cellphone_captcha`, user.cellphoneVerifyOne);
-	router.post(`${prefix}users/cellphone_captcha`, user.cellphoneVerifyTwo);
+	router.post(`${prefix}users/cellphone_bind`, user.cellphoneBind);
 	router.get(`${prefix}users/contacts`, user.contacts);
 	router.get(`${prefix}users/qr`, user.qr);
 	router.resources(`${prefix}users`, user);
@@ -234,6 +235,7 @@ module.exports = app => {
 
 	// 便条 随手记
 	const note = controller.note;
+	router.post(`${prefix}notes/:id/tags`, note.setTags);
 	router.resources(`${prefix}notes`, note);
 
 	// 便条包

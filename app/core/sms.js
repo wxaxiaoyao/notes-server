@@ -56,6 +56,8 @@ module.exports = app => {
 
 		if (data.statusCode == "000000") return true;
 
+		console.log(data);
+
 		return false;
 	}
 

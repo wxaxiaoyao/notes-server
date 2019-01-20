@@ -67,3 +67,4 @@ drop table userTags;
 
 alter table contacts drop column tags;
 desc contacts;
+

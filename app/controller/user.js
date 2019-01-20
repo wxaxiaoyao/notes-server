@@ -1,5 +1,10 @@
 const _ = require("lodash");
+const joi = require("joi");
 const Controller = require("../core/controller.js");
+const {
+	CAPTCHA_TYPE_CELLPHONE,
+	CAPTCHA_TYPE_EMAIL,
+} = require("../core/consts.js");
 
 const User = class extends Controller {
 	get modelName() {
@@ -45,7 +50,7 @@ const User = class extends Controller {
 
 		delete params.id;
 		delete params.password;
-		delete params.username;
+		//delete params.username;
 
 		const ok = await model.users.update(params, {where:{id:userId}});
 
@@ -60,6 +65,27 @@ const User = class extends Controller {
 		if (!data) return this.success(false);
 
 		return this.success(true);
+	}
+
+	async cellphoneLogin() {
+		const {cellphone, captcha} = this.validate({cellphone:"string", captcha:"string"});
+		const cache = await this.model.caches.get(cellphone);
+		if (!cache || !captcha || cache.captcha != captcha) return this.fail(5);
+
+		const portrait = 'http://statics.qiniu.wxaxiaoyao.cn/_/portraits/default_portrait.png';
+		let user = await this.model.users.findOne({where:{cellphone}}).then(o => o && o.toJSON());
+		// 用户不存在则注册
+		user = user || await this.model.users.create({cellphone, portrait}).then(o => o && o.toJSON());
+		if (!user) this.throw(500);
+
+		const config = this.app.config.self;
+		const token = this.app.util.jwt_encode({
+			userId: user.id, 
+			username: user.username
+		}, config.secret, config.tokenExpire);
+
+		user.token = token;
+		return this.success(user);
 	}
 
 	async login() {
@@ -201,45 +227,57 @@ const User = class extends Controller {
 		return this.fail(10);	
 	}
 
-	// 手机验证第一步
-	async cellphoneVerifyOne() {
-		const {ctx, app} = this;
-		const {model} = this.app;
-		const params = this.validate({
-			cellphone:"string",
+	// 验证验证码
+	async captchaVerify(key, captcha) {
+		const cache = await this.model.caches.get(key);
+		if (!captcha || !cache || cache.captcha != captcha) return false;
+		return true;
+	}
+
+	// 验证码
+	async captcha() {
+		const {key, type} = this.validate({
+			key:'string', 
+			type:joi.number().valid(CAPTCHA_TYPE_CELLPHONE, CAPTCHA_TYPE_EMAIL),
 		});
-		const cellphone = params.cellphone;
+
 		const captcha = _.times(4, () =>  _.random(0,9,false)).join("");
 
-		const ok = await app.sendSms(cellphone, [captcha, "3分钟"]);
-		if (!ok) return this.throw(500, "请求次数过多");
-		
-		await app.model.caches.put(cellphone, {captcha}, 1000 * 60 * 3); // 10分钟有效期
+		await this.app.model.caches.put(key, {captcha}, 1000 * 60 * 3); // 10分钟有效期
 
-		return this.success();
+		if (type == CAPTCHA_TYPE_CELLPHONE) {
+			const ok = await this.app.sendSms(key, [captcha, "3分钟"]);
+			if (!ok) return this.throw(500, "请求次数过多");
+		} else if (type == CAPTCHA_TYPE_EMAIL) {
+			const body = `<h3>尊敬的Note用户:</h3><p>您好: 您的邮箱验证码为${captcha}, 请在10分钟内完成邮箱验证。谢谢</p>`;
+			const ok = await this.app.sendEmail(email, "Note 邮箱绑定验证", body);
+			if (!ok) return this.throw(500, "请求次数过多");
+		}
+
+		return this.success("OK");
 	}
-	
-	// 手机验证第二步  ==> 手机绑定
-	async cellphoneVerifyTwo() {
-		const {ctx, app} = this;
-		const {model} = this.app;
 
+	// 手机验证第二步  ==> 手机绑定
+	async cellphoneBind() {
 		const userId = this.authenticated().userId;
-		const params = this.validate({
+		const {cellphone, captcha, bind} = this.validate({
 			cellphone:"string",
 			captcha:"string",
+			bind: "boolean",
 		});
-		const captcha = params.captcha;
-		let cellphone = params.cellphone;
 		
 		const ok = await this.captchaVerify(cellphone, captcha);
 		if (!ok) return this.fail(5);
-		
-		if (!params.isBind) cellphone = null;
-
-		const result = await model.users.update({cellphone}, {where:{id:userId}});
-
-		return this.success(result && result[0] == 1);
+		const user = await this.model.users.findOne({where:{cellphone}}).then(o => o && o.toJSON());
+		if (bind) {
+			if (user) return this.fail(11);
+			const res = await this.model.users.update({cellphone}, {where:{id: userId}});
+			return this.success(res);
+		} else {
+			if (user.id != userId) return this.faild(12);
+			const res = await this.model.users.update({cellphone:null}, {where:{id: userId}});
+			return this.success(res);
+		}
 	}
 
 	// 邮箱验证第一步

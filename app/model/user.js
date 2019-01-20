@@ -21,12 +21,10 @@ module.exports = app => {
 		username: {
 			type: STRING(48),
 			unique: true,
-			allowNull: false,
 		},
 
 		password: {
 			type: STRING(48),
-			allowNull: false,
 		},
 
 		roleId: {
