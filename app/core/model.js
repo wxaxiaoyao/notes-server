@@ -1,6 +1,13 @@
 const _ = require("lodash");
+const octokit = require('@octokit/rest')();
 
-module.exports = app => {
+module.exports = (app) => {
+	const config = app.config.self;
+	octokit.authenticate({
+		type: 'token',
+		token: config.github.token,
+	});
+
 	const models = {
 		users:"users", 
 		pages:"pages",
@@ -15,11 +22,29 @@ module.exports = app => {
 	const timers = {};
 	const sequelize = app.model;
 
+	async function writeGithubFile(path, text) {
+		const data = {
+			owner: config.github.owner,
+			repo: config.github.repo,
+			path,
+		}
+		const file = await octokit.repos.getContents(data).then(res => res.data).catch(e => console.log(e));
+		
+		data.content = app.util.base64(text || "");
+		data.message = "system commit";
+		if (file) {
+			await octokit.repos.updateFile({...data, sha:file.sha}).then(res => console.log(res));
+		} else {
+			await octokit.repos.createFile(data).then(res => console.log(res));
+		}
+	}
+
 	function writeFile(url, text) {
 		timers[url] && clearTimeout(timers[url]);
 		timers[url] = setTimeout(async() => {
 			console.log("备份数据到七牛: " + url);
 			await app.storage.upload(url, text);
+			await writeGithubFile(url, text);
 		}, 3000);
 	}
 

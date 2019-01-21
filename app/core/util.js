@@ -5,6 +5,7 @@ const Hashes = require("jshashes");
 const uuidv1 = require("uuid/v1");
 const md5 = require("blueimp-md5");
 const crypto = require("crypto");
+const base64 = require('js-base64').Base64;
 
 const sha1 = new Hashes.SHA1().setUTF8(true);
 
@@ -58,6 +59,10 @@ util.jwt_decode = function(token, key, noVerify) {
 	}
 
 	return ;
+}
+
+util.base64  = function(text) {
+	return base64.encode(text);
 }
 
 util.getDate = function(str = null) {
