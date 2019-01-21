@@ -5,6 +5,7 @@ module.exports = app => {
 		users:"users", 
 		pages:"pages",
 		dailies:"dailies",
+		notes: "notes",
 		links: "links",
 		bugs: "bugs",
 		apis: "apis",
@@ -29,7 +30,7 @@ module.exports = app => {
 		const page = Math.floor(no / size);
 		const offset = page * size;
 		const list = await model.findAll({where:{userId}, limit:size, offset});
-		const text = JSON.stringify(list);
+		const text = JSON.stringify(list, undefined, 4);
 
 		const url = `__data__/${tableName}/${userId}/${page}.json`;
 

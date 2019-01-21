@@ -10,6 +10,35 @@ const Note = class extends Controller {
 		return "notes";
 	}
 
+	async show() {
+		const {userId} = this.authenticated();
+		const {id} = this.validate();
+
+		const note = await this.model.notes.findOne({
+			include: [
+			{
+				include: {
+					as: "classifyTags",
+					model: this.model.classifyTags,
+					where: {
+						classify: CLASSIFY_TAG_NOTE,
+					},
+				},
+				as:"objectTags",
+				model:this.model.objectTags,
+			},
+			],
+			where:{userId, id},
+		}).then(o => {
+			o = o.toJSON();
+			o.classifyTags = [];
+			_.each(o.objectTags, objTag => o.classifyTags.push(objTag.classifyTags));
+			return o;
+		});
+
+		return this.success(note);
+	}
+
 	async index() {
 		const {userId} = this.authenticated();
 		const query = this.validate();
