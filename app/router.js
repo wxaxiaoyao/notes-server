@@ -31,6 +31,9 @@ module.exports = app => {
 	router.get(`${prefix}users/qr`, user.qr);
 	router.resources(`${prefix}users`, user);
 
+	const document = controller.document;
+	router.resources(`${prefix}documents`, document);
+	
 	const site = controller.site;
 	router.post(`${prefix}sites/search`, site.search);
 	router.get(`${prefix}sites/get_by_name`, site.getByName);
@@ -43,7 +46,6 @@ module.exports = app => {
 	router.resources(`${prefix}sites`, site);
 
 	const page = controller.page;
-	router.get(`${prefix}pages/test`, page.test);
 	router.get(`${prefix}pages/qiniuImport`, page.qiniuImport);
 	router.get(`${prefix}pages/visit`, page.visit);
 	router.get(`${prefix}pages/:id/setting`, page.getSetting);

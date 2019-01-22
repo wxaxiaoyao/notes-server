@@ -7,13 +7,6 @@ const Page = class extends Controller {
 		return "pages";
 	}
 	
-	async test() {
-		for (let i = 0; i < pages.length; i++) {
-			const page = pages[i];
-			await this.model.pages.upsert(page);
-		}
-	}
-
 	getPathByUrl(url) {
 		let paths = url.split("/");
 		paths.splice(1,0, "pages");
