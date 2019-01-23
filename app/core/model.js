@@ -10,6 +10,7 @@ module.exports = (app) => {
 
 	const models = {
 		users:"users", 
+		documents: "documents",
 		pages:"pages",
 		dailies:"dailies",
 		notes: "notes",
@@ -75,7 +76,7 @@ module.exports = (app) => {
 			return model.__hook__(data, oper);
 		}
  
-		if (tableName == "users" || tableName == "pages") {
+		if (tableName == "users" || tableName == "pages" || tableName == "documents") {
 			single(tableName, model, data);
 		} else {
 			multi(tableName, model, data);
