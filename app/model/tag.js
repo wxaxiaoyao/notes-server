@@ -17,14 +17,19 @@ module.exports = app => {
 			primaryKey: true,
 		},
 		
-		userId: {                    // 评论者
+		userId: {                    // 所属者
 			type: BIGINT,
 			allowNull: false,
 		},
+		
+		classify: {                  // 分类  1 -- 联系人分类
+			type: INTEGER,
+			defaultValue: 0,
+		},
 
-		name: {
-			type: STRING(24),
-			allowNull: false,
+		tagname: {                  // 标签名
+			type: STRING,
+			defaultValue:"",
 		},
 
 	}, {
@@ -34,7 +39,7 @@ module.exports = app => {
 		indexes: [
 		{
 			unique: true,
-			fields: ["userId", "name"],
+			fields: ["userId", "classify", "tagname"],
 		},
 		],
 	});
@@ -46,10 +51,3 @@ module.exports = app => {
 	app.model.tags = model;
 	return model;
 };
-
-
-
-
-
-
-

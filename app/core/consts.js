@@ -128,6 +128,7 @@ module.exports = {
 	CLASSIFY_TAG_KNOWLEDGE:2, // 知识tag
 	CLASSIFY_TAG_NOTE:3,      // 便条tag
 	CLASSIFY_TAG_DAILY:4,     // 日报tag
+	CLASSIFY_TAG_DOCUMENT:5,  // 文档tag
 }
 
 

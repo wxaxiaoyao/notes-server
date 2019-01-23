@@ -27,7 +27,12 @@ module.exports = app => {
 			defaultValue:0,
 		},
 
-		classifyTagId: {             // 分类标签id
+		classify: {                  // 分类
+			type: INTEGER,
+			defaultValue: 0,
+		},
+
+		tagId: {                     // 分类标签id
 			type: BIGINT,
 			defaultValue: 0,
 		},
@@ -39,7 +44,7 @@ module.exports = app => {
 		indexes: [
 		{
 			unique: true,
-			fields: ["objectId", "classifyTagId"],
+			fields: ["objectId", "classify", "tagId"],
 		},
 		],
 	});

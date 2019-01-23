@@ -1,4 +1,3 @@
-
 const _ = require("lodash");
 
 module.exports = app => {
@@ -25,6 +24,12 @@ module.exports = app => {
 			allowNull: false,
 		},
 
+		folderId: {                  // 文件夹ID
+			type: BIGINT,
+			allowNull: false,
+			defaultValue: 0,
+		},
+
 		filename: {                  //  文件名
 			type: STRING,
 			defaultValue: "",
@@ -33,11 +38,6 @@ module.exports = app => {
 		text: {                      // 文档内容
 			type: TEXT,
 			defaultValue: "",
-		},
-
-		tags: {                      // 标签
-			type: STRING,
-			defaultValue:"|",
 		},
 
 		extra: {
@@ -52,7 +52,7 @@ module.exports = app => {
 		indexes: [
 		{
 			unique: true,
-			fields: ["userId", "filename"],
+			fields: ["userId", "folderId", "filename"],
 		},
 		],
 	});

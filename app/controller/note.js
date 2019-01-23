@@ -48,8 +48,8 @@ const Note = class extends Controller {
 			include: [
 			{
 				include: {
-					as: "classifyTags",
-					model: this.model.classifyTags,
+					as: "tags",
+					model: this.model.tags,
 					where: {
 						classify: CLASSIFY_TAG_NOTE,
 					},
@@ -62,24 +62,12 @@ const Note = class extends Controller {
 		}).then(list => {
 			return _.map(list, o => {
 				o = o.toJSON();
-				o.classifyTags = [];
-				_.each(o.objectTags, objTag => o.classifyTags.push(objTag.classifyTags));
+				o.tags = o.objectTags.map(o => o.tags);
 				return o;
 			});
 		});
 
 		return this.success(list);
-	}
-
-	async setTags() {
-		const {userId} = this.authenticated();
-		const {id, tags} = this.validate();
-		await this.model.query(`delete objectTags from objectTags, classifyTags where objectTags.classifyTagId = classifyTags.id and classifyTags.classify = ${CLASSIFY_TAG_NOTE} and objectTags.objectId = ${id}`);
-
-		const list = _.map(tags, o => ({userId, objectId:id, classifyTagId: o.id}));
-		const res = await this.model.objectTags.bulkCreate(list);
-
-		return this.success(res);
 	}
 
 	async create() {
@@ -90,10 +78,8 @@ const Note = class extends Controller {
 		const note = await this.model.notes.create(params).then(o => o && o.toJSON());
 		if (!note) return this.throw(400);
 
-		if (params.classifyTags) {
-			const objectId = note.id;
-			const list = [];
-			_.each(params.classifyTags, o => list.push({userId, objectId, classifyTagId: o.id}));
+		if (params.tags) {
+			const list = _.map(params.tags, tagId => ({objectId: note.id, classify: CLASSIFY_TAG_NOTE, tagId}));
 			await this.model.objectTags.bulkCreate(list);
 		}
 
@@ -108,10 +94,9 @@ const Note = class extends Controller {
 
 		await this.model.notes.update(params, {where:{id, userId}});
 
-		if (params.classifyTags) {
-			await this.model.query(`delete objectTags from objectTags, classifyTags where objectTags.classifyTagId = classifyTags.id and classifyTags.classify = ${CLASSIFY_TAG_NOTE} and objectTags.objectId = ${id}`);
-			const list = [];
-			_.each(params.classifyTags, o => list.push({userId, objectId:id, classifyTagId: o.id}));
+		if (params.tags) {
+			await this.model.objectTags.destroy({where:{userId, objectId: id, classify: CLASSIFY_TAG_NOTE}});
+			const list = _.map(params.tags, tagId => ({objectId: note.id, classify: CLASSIFY_TAG_NOTE, tagId}));
 			await this.model.objectTags.bulkCreate(list);
 		}
 
@@ -123,7 +108,7 @@ const Note = class extends Controller {
 		const {id} = this.validate();
 		
 		await this.model.notes.destroy({where:{id, userId}});
-		await this.model.query(`delete objectTags from objectTags, classifyTags where objectTags.classifyTagId = classifyTags.id and classifyTags.classify = ${CLASSIFY_TAG_NOTE} and objectTags.objectId = ${id}`);
+		await this.model.objectTags.destroy({where:{userId, objectId: id, classify: CLASSIFY_TAG_NOTE}});
 
 		return this.success();
 	}

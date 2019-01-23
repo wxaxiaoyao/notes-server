@@ -60,16 +60,16 @@ module.exports = app => {
 		constraints: false,
 	});
 
-	classifyTags.hasMany(objectTags, {
+	app.model.tags.hasMany(objectTags, {
 		as: "objectTags",
-		foreignKey: "classifyTagId",
+		foreignKey: "tagId",
 		sourceKey: "id",
 		constraints: false,
 	});
 	
-	objectTags.belongsTo(classifyTags, {
-		as: "classifyTags",
-		foreignKey: "classifyTagId",
+	objectTags.belongsTo(app.model.tags, {
+		as: "tags",
+		foreignKey: "tagId",
 		targetKey: "id",
 		constraints: false,
 	});
@@ -83,6 +83,20 @@ module.exports = app => {
 
 	app.model.objectTags.belongsTo(app.model.notes, {
 		as: "notes",
+		foreignKey: "objectId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.documents.hasMany(app.model.objectTags, {
+		as: 'objectTags',
+		foreignKey: "objectId",
+		sourceKey:"id",
+		constraints: false,
+	});
+
+	app.model.objectTags.belongsTo(app.model.documents, {
+		as: "documents",
 		foreignKey: "objectId",
 		sourceKey: "id",
 		constraints: false,

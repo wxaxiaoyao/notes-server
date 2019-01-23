@@ -1,3 +1,4 @@
+const _ = require("lodash");
 
 module.exports = app => {
 	const {
@@ -8,28 +9,35 @@ module.exports = app => {
 		BOOLEAN,
 		JSON,
 		DATE,
+		NOW,
 	} = app.Sequelize;
 
-	const model = app.model.define("classifyTags", {
+	const model = app.model.define("folders", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
 			primaryKey: true,
 		},
 		
-		userId: {                    // 所属者
+		userId: {                    // 所属者 记录创建者
 			type: BIGINT,
 			allowNull: false,
 		},
-		
-		classify: {                  // 分类  1 -- 联系人分类
-			type: INTEGER,
+
+		folderId: {                  // 父文件夹id
+			type: BIGINT,
+			allowNull: false,
 			defaultValue: 0,
 		},
 
-		tagname: {                  // 标签名
+		foldername: {                // 文件夹名
 			type: STRING,
-			defaultValue:"",
+			defaultValue: "",
+		},
+
+		extra: {
+			type: JSON,
+			defaultValue: {},
 		},
 
 	}, {
@@ -39,7 +47,7 @@ module.exports = app => {
 		indexes: [
 		{
 			unique: true,
-			fields: ["userId", "classify", "tagname"],
+			fields: ["userId", "folderId", "foldername"],
 		},
 		],
 	});
@@ -48,6 +56,6 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
-	app.model.classifyTags = model;
+	app.model.folders = model;
 	return model;
 };

@@ -31,9 +31,20 @@ module.exports = app => {
 	router.get(`${prefix}users/qr`, user.qr);
 	router.resources(`${prefix}users`, user);
 
+	const folder = controller.folder;
+	router.resources(`${prefix}folders`, folder);
+
 	const document = controller.document;
 	router.resources(`${prefix}documents`, document);
 	
+	const tag = controller.tag;
+	router.post(`${prefix}tags/upsert`, tag.upsert);
+	router.resources(`${prefix}tags`, tag);
+	
+	const objectTag = controller.objectTag;
+	router.post(`${prefix}objectTags/set_tags`, objectTag.setTags);
+	router.resources(`${prefix}objectTags`, objectTag);
+
 	const site = controller.site;
 	router.post(`${prefix}sites/search`, site.search);
 	router.get(`${prefix}sites/get_by_name`, site.getByName);
@@ -174,10 +185,6 @@ module.exports = app => {
 	const todo = controller.todo;
 	router.resources(`${prefix}todos`, todo);
 
-	const tag = controller.tag;
-	router.post(`${prefix}tags/upsert`, tag.upsert);
-	router.resources(`${prefix}tags`, tag);
-	
 	const project = controller.project;
 	router.post(`${prefix}projects/search`, project.search);
 	router.resources(`${prefix}projects`, project);
@@ -211,12 +218,6 @@ module.exports = app => {
 	router.put(`${prefix}applies/:id/state`, apply.state);
 	router.resources(`${prefix}applies`, apply);
 
-	// 分类tag
-	const classifyTag = controller.classifyTag;
-	router.post(`${prefix}classifyTags/:id/set_objects`, classifyTag.setObjects);
-	router.post(`${prefix}classifyTags/set_tags`, classifyTag.setTags);
-	router.resources(`${prefix}classifyTags`, classifyTag);
-
 	// 位置信息
 	const locations = controller.location;
 	router.get(`${prefix}locations/nearby`, locations.getNearBy);
@@ -237,7 +238,6 @@ module.exports = app => {
 
 	// 便条 随手记
 	const note = controller.note;
-	router.post(`${prefix}notes/:id/tags`, note.setTags);
 	router.resources(`${prefix}notes`, note);
 
 	// 便条包
