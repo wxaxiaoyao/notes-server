@@ -18,8 +18,8 @@ const Note = class extends Controller {
 			include: [
 			{
 				include: {
-					as: "classifyTags",
-					model: this.model.classifyTags,
+					as: "tags",
+					model: this.model.tags,
 					where: {
 						classify: CLASSIFY_TAG_NOTE,
 					},
@@ -31,8 +31,7 @@ const Note = class extends Controller {
 			where:{userId, id},
 		}).then(o => {
 			o = o.toJSON();
-			o.classifyTags = [];
-			_.each(o.objectTags, objTag => o.classifyTags.push(objTag.classifyTags));
+			o.tags = o.objectTags.map(o => o.tags);
 			return o;
 		});
 
@@ -79,7 +78,7 @@ const Note = class extends Controller {
 		if (!note) return this.throw(400);
 
 		if (params.tags) {
-			const list = _.map(params.tags, tagId => ({objectId: note.id, classify: CLASSIFY_TAG_NOTE, tagId}));
+			const list = _.map(params.tags, o => ({userId, objectId: note.id, classify: CLASSIFY_TAG_NOTE, tagId:o.id}));
 			await this.model.objectTags.bulkCreate(list);
 		}
 
@@ -96,7 +95,7 @@ const Note = class extends Controller {
 
 		if (params.tags) {
 			await this.model.objectTags.destroy({where:{userId, objectId: id, classify: CLASSIFY_TAG_NOTE}});
-			const list = _.map(params.tags, tagId => ({objectId: note.id, classify: CLASSIFY_TAG_NOTE, tagId}));
+			const list = _.map(params.tags, o => ({userId, objectId: id, classify: CLASSIFY_TAG_NOTE, tagId:o.id}));
 			await this.model.objectTags.bulkCreate(list);
 		}
 
