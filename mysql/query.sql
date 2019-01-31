@@ -27,8 +27,12 @@ select * from notes;
 select * from locations;
 select count(*) from pages;
 
-delete from objectTags where id > 0;
-delete from `classifyTags` where id > 0;
+select * from objectTags where tagId in (select id from tags where classify = 3);
+
+select tags.id, tags.tagname, count(*) as count from objectTags, tags where objectTags.tagId = tags.id and tags.classify = 3 group by tagId;
+
+
+
 
 update applies set state = 0 where id = 1;
 select md5("wuxiangan");
