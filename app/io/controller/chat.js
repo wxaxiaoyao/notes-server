@@ -13,6 +13,7 @@ class Chat extends Controller {
 		const rooms = [];
 		_.each(sessions, session => rooms.push(session.sessionId));
 
+		//console.log(sessions);
 		socket.join(rooms, this.success(sessions));
 	}
 

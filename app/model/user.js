@@ -98,6 +98,8 @@ module.exports = app => {
 	}
 
 	model.getUsers = async function(userIds = []) {
+		if (userIds.length == 0) return {};
+
 		const attributes = [["id", "userId"], "username", "nickname", "portrait", "description"];
 		const list = await app.model.users.findAll({
 			attributes,

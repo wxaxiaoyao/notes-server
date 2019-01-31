@@ -123,6 +123,8 @@ module.exports = app => {
 			sessions[i] = session;
 		});
 
+		if (userIds.length == 0) return sessions;
+
 		const users = await app.model.users.getUsers(userIds);
 		_.each(sessions, session => {
 			const members = [];

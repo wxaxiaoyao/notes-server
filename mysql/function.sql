@@ -10,3 +10,7 @@ delimiter ;
 drop function f_lng_lat_distance;
 
 show function status;
+
+select * from locations;
+
+select userId, distance, username, nickname, portrait, sex from (select userId, f_lng_lat_distance(114.036362, 22.621605, longitude, latitude) as distance from locations where userId != 1) as dist, users where users.id = dist.userId limit 1 offset 2;
