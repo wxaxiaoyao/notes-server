@@ -62,6 +62,11 @@ module.exports = app => {
 			defaultValue:"",
 		},
 
+		extra: {
+			type: JSON,
+			defaultValue: {},
+		},
+
 	}, {
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',

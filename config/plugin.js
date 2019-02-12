@@ -14,3 +14,7 @@ exports.io = {
 	package: "egg-socket.io",
 }
 
+exports.graphql = {
+	enable: true,
+	package: 'egg-graphql',
+}

@@ -1,7 +1,7 @@
 
-exports.keys = "keepwork";
+exports.keys = "notes";
 
-exports.middleware = ['authenticated', 'pagination'];
+exports.middleware = ['authenticated', 'pagination', 'graphql'];
 
 exports.security = {
 	xframe: {
@@ -36,4 +36,18 @@ exports.io = {
 exports.multipart = {
 	mode:"stream",
 	whitelist: filename => true,
+}
+
+exports.graphql = {
+	router: '/api/graphql',
+	app: true,
+	agent: false,
+	graphiql: true,
+
+	onPreGraphQL: async (ctx) => {
+
+	},
+	onPreGraphiQL: async (ctx) => {
+		
+	},
 }
