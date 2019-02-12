@@ -238,6 +238,7 @@ module.exports = app => {
 
 	// 便条 随手记
 	const note = controller.note;
+	router.post(`${prefix}notes/search`, note.search);
 	router.resources(`${prefix}notes`, note);
 
 	// 便条包

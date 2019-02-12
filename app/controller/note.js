@@ -38,6 +38,31 @@ const Note = class extends Controller {
 		return this.success(note);
 	}
 
+	async search() {
+		const {tagId, value=""} = this.validate({
+			tagId:"int_optional",
+		});
+		const list = await this.model.notes.findAll({
+			include: [
+			{
+				as:"objectTags",
+				model:this.model.objectTags,
+				where: {
+					tagId: tagId,
+					classify: CLASSIFY_TAG_NOTE,
+				}
+			}
+			],
+			where: {
+				text: {
+					[this.model.Op.like]:`%${value}%`,
+				}
+			}
+		});
+		
+		return this.success(list);
+	}
+
 	async index() {
 		const {userId} = this.authenticated();
 		const query = this.validate();
