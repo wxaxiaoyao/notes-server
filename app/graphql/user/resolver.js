@@ -2,19 +2,32 @@
 
 module.exports = {
 	User: {
-		rank(root, {userId}, ctx) {
-			return ctx.connector.user.fetchRankByUserId(root.id);
+		statistics(root, _, ctx) {
+			return ctx.connector.user.fetchStatisticsByUserId(root.id);
 		},
-		contributions(root, {years}, ctx) {
-			years = (years || "").split(",");
-			return ctx.connector.user.fetchContributionsByUserId(root.id, years);
+	},
+
+	Statistics: {
+		documentCount({userId}, _, ctx) {
+			return ctx.connector.user.fetchDocumentCountByUserId(userId);
+		},
+
+		noteCount({userId}, _, ctx) {
+			return ctx.connector.user.fetchNoteCountByUserId(userId);
+		},
+
+		dailyCount({userId}, _, ctx) {
+			return ctx.connector.user.fetchDailyCountByUserId(userId);
+		},
+
+		fansCount({userId}, _, ctx) {
+			return ctx.connector.user.fetchFansCountByUserId(userId);
+		},
+
+		followCount({userId}, _, ctx) {
+			return ctx.connector.user.fetchFollowCountByUserId(userId);
 		},
 	},
 };
 
 
-	//fans(page: Int = 1, perPage: Int = 100): [Favorite]
-	//favorites(page: Int = 1, perPage: Int = 100): [Favorite]
-//type FansUser {
-	//id ID!
-//}

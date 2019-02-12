@@ -1,6 +1,7 @@
 'use strict';
 
 const DataLoader = require('dataloader');
+const consts = require("../../core/consts.js");
 
 class UserConnector {
 	constructor(ctx) {
@@ -38,6 +39,26 @@ class UserConnector {
 
 	async fetchFansByUserId(userId, page, perPage) {
 		return this.model.favorites.getFollows(userId);
+	}
+
+	async fetchStatisticsByUserId(userId) {
+		return {userId};
+	}
+
+	async fetchDocumentCountByUserId(userId) {
+		return await this.model.documents.count({where:{userId}});
+	}
+	async fetchNoteCountByUserId(userId) {
+		return await this.model.notes.count({where:{userId}});
+	}
+	async fetchDailyCountByUserId(userId) {
+		return await this.model.dailies.count({where:{userId}});
+	}
+	async fetchFansByUserId(userId) {
+		return await this.model.dailies.count({where:{objectId:userId, objectType: consts.OBJECT_TYPE_USER}});
+	}
+	async fetchFollowByUserId(userId) {
+		return await this.model.dailies.count({where:{userId, objectType: consts.OBJECT_TYPE_USER}});
 	}
 }
 

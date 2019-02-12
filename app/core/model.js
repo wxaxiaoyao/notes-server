@@ -52,7 +52,7 @@ module.exports = (app) => {
 	async function multi(tableName, model, inst) {
 		const {userId, id} = inst;
 		const no = await model.count({where:{userId, id: {[app.model.Op.lte]:id}}});
-		const size = 3000;
+		const size = 1000;
 		const page = Math.floor(no / size);
 		const offset = page * size;
 		const list = await model.findAll({where:{userId}, limit:size, offset});
@@ -66,7 +66,7 @@ module.exports = (app) => {
 	async function single(tableName, model, inst) {
 		const {userId=0, id}  = inst; 
 		const url = `__data__/${tableName}/${userId}/${id}.json`;
-		const text = JSON.stringify(inst);
+		const text = JSON.stringify(inst, undefined, 4);
 
 		writeFile(url, text);
 	}

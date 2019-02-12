@@ -67,6 +67,13 @@ const User = class extends Controller {
 		return this.success(true);
 	}
 
+	async userLoginSuccess(user) {
+		const extra = user.extra || {};
+		extra.lastLoginTime = new Date();
+		await this.model.users.update({extra}, {where:{id: user.id}});
+		return;
+	}
+
 	async cellphoneLogin() {
 		const {cellphone, captcha} = this.validate({cellphone:"string", captcha:"string"});
 		const cache = await this.model.caches.get(cellphone);
@@ -85,6 +92,8 @@ const User = class extends Controller {
 		}, config.secret, config.tokenExpire);
 
 		user.token = token;
+
+		await this.userLoginSuccess(user);
 		return this.success(user);
 	}
 
@@ -118,6 +127,7 @@ const User = class extends Controller {
 
 		user.token = token;
 		//user.roleId = roleId;
+		
 		ctx.cookies.set("token", token, {
 			httpOnly: false,
 			maxAge: config.tokenExpire * 1000,
@@ -125,6 +135,7 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
+		await this.userLoginSuccess(user);
 		return this.success(user);
 	}
 
