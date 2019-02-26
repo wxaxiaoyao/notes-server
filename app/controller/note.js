@@ -55,6 +55,7 @@ const Note = class extends Controller {
 			objectTagsWhere.tagId = tagId;
 		}
 		const list = await this.model.notes.findAndCount({
+			...this.queryOptions,
 			include: [
 			{
 				include: {
