@@ -39,25 +39,30 @@ const Note = class extends Controller {
 	}
 
 	async search() {
-		const {tagId, value=""} = this.validate({
+		const {tagId, text} = this.validate({
 			tagId:"int_optional",
 		});
-		const list = await this.model.notes.findAll({
+		const where = {};
+		if (text != undefined) {
+			where.text = {
+				[this.model.Op.like]:`%${text}%`,
+			}
+		};
+		const objectTagsWhere = {
+			classify: CLASSIFY_TAG_NOTE,
+		}
+		if (tagId) {
+			objectTagsWhere.tagId = tagId;
+		}
+		const list = await this.model.notes.findAndCount({
 			include: [
 			{
 				as:"objectTags",
 				model:this.model.objectTags,
-				where: {
-					tagId: tagId,
-					classify: CLASSIFY_TAG_NOTE,
-				}
+				where: objectTagsWhere,
 			}
 			],
-			where: {
-				text: {
-					[this.model.Op.like]:`%${value}%`,
-				}
-			}
+			where,
 		});
 		
 		return this.success(list);
