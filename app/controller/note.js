@@ -69,6 +69,7 @@ const Note = class extends Controller {
 		query.userId = userId;
 
 		const list = await this.model.notes.findAll({
+			...this.queryOptions,
 			include: [
 			{
 				include: {
