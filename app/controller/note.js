@@ -57,12 +57,27 @@ const Note = class extends Controller {
 		const list = await this.model.notes.findAndCount({
 			include: [
 			{
+				include: {
+					as: "tags",
+					model: this.model.tags,
+					where: {
+						classify: CLASSIFY_TAG_NOTE,
+					},
+				},
 				as:"objectTags",
 				model:this.model.objectTags,
 				where: objectTagsWhere,
-			}
+			},
 			],
 			where,
+		}).then(result => {
+			result.rows = _.map(result.rows, o => {
+				o = o.toJSON();
+				o.tags = o.objectTags.map(o => o.tags);
+				return o;
+			});
+
+			return result;
 		});
 		
 		return this.success(list);
