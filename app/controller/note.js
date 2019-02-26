@@ -54,8 +54,18 @@ const Note = class extends Controller {
 		if (tagId) {
 			objectTagsWhere.tagId = tagId;
 		}
-		const list = await this.model.notes.findAndCount({
+		const result = await this.model.notes.findAndCount({
 			...this.queryOptions,
+			include: [
+			{
+				as:"objectTags",
+				model:this.model.objectTags,
+				where: objectTagsWhere,
+			},
+			],
+			where,
+		});
+		const list = await this.model.notes.findAll({
 			include: [
 			{
 				include: {
@@ -67,21 +77,23 @@ const Note = class extends Controller {
 				},
 				as:"objectTags",
 				model:this.model.objectTags,
-				where: objectTagsWhere,
 			},
 			],
-			where,
-		}).then(result => {
-			result.rows = _.map(result.rows, o => {
+			where: {
+				id: {
+					[this.model.Op.in]: _.map(result.rows, o => o.id),
+				}
+			}
+		}).then(list => {
+			return _.map(list, o => {
 				o = o.toJSON();
 				o.tags = o.objectTags.map(o => o.tags);
 				return o;
 			});
-
-			return result;
 		});
+		result.rows = list;
 		
-		return this.success(list);
+		return this.success(result);
 	}
 
 	async index() {
