@@ -39,6 +39,7 @@ module.exports = app => {
 	
 	const tag = controller.tag;
 	router.post(`${prefix}tags/upsert`, tag.upsert);
+	router.get(`${prefix}tags/all`, tag.all);
 	router.resources(`${prefix}tags`, tag);
 	
 	const objectTag = controller.objectTag;

@@ -7,6 +7,13 @@ const Tag = class extends Controller {
 		return "tags";
 	}
 	
+	async all() {
+		const {userId} = this.authenticated();
+		const list = await this.model.tags.findAll({limit:10000}).then(list => list.map(o => o.toJSON()));
+		
+		return this.success(list);
+	}
+
 	async index() {
 		const {classify} = this.validate({classify:"int"});
 		const sql = `select tags.*, count(objectTags.id) as count from objectTags right join tags on objectTags.tagId = tags.id where tags.classify = :classify group by tags.id`;
